@@ -1,12 +1,68 @@
 # Tugas B201
-## Install Ubuntu Server 18.04
+
+## 1. Install Ubuntu Server 18.04
 
 1. Buat boot dari Iso Ubuntu 18.04 (rufus)
+
 2. Ikuti langkah-langkah nya
 
+<br>
+
+## 2. Install Samba
 
 
-## Install PostgreSQL from source
+<br>
+
+## 3. Install FTP
+1. ```$ sudo apt update```
+
+2. ```$ sudo apt install vsftpd```
+
+3. ```$ sudo service vsftpd status```
+
+4. Configure firewall
+
+    ```$ sudo ufw allow 20/tcp ```
+
+    ```$ sudo ufw allow 20/tcp ```
+
+<br>
+
+## 4. Install SSH
+1. ```$ sudo apt update ```
+
+2.  ```$ sudo apt install openssh-server```
+
+3. ```$ sudo ufw allow ssh ```
+
+4. ```$ sudo /etc/init.d/ssh status```
+
+<br>
+
+## 5. Install Apache
+1. ```$ sudo apt get update ```
+
+2. ```$ sudo apt-get install apache2 ```
+
+3. ```$ sudo ufw allow 'Apache'```
+
+    Start Apache
+
+4. ```$ sudo /etc/init.d/apache2 start``` 
+
+    restart Apache
+
+5. ```$ sudo /etc/init.d/apache2 restart```
+
+    Stop Apache
+6. ```$ sudo /etc/init.d/apache2 stop ```
+
+    Status Apache
+7. ```$ sudo /etc/init.d/apache2 status```
+
+<br>
+
+## 6. Install PostgreSQL from source
 
 1. Download PostgreSQL source
 
@@ -68,55 +124,9 @@
 
     ```$ pgsql ```
 
-## Install Apache
-1. ```$ sudo apt get update ```
-
-2. ```$ sudo apt-get install apache2 ```
-
-3. ```$ sudo ufw allow 'Apache'```
-
-    Start Apache
-
-4. ```$ sudo /etc/init.d/apache2 start``` 
-
-    restart Apache
-
-5. ```$ sudo /etc/init.d/apache2 restart```
-
-    Stop Apache
-6. ```$ sudo /etc/init.d/apache2 stop ```
-
-    Status Apache
-7. ```$ sudo /etc/init.d/apache2 status```
-
 <br>
-
-## Install SSH
-1. ```$ sudo apt update ```
-
-2.  ```$ sudo apt install openssh-server```
-
-3. ```$ sudo ufw allow ssh ```
-
-4. ```$ sudo /etc/init.d/ssh status```
-
 <br>
-
-## Install FTP
-1. ```$ sudo apt update```
-
-2. ```$ sudo apt install vsftpd```
-
-3. ```$ sudo service vsftpd status```
-
-4. Configure firewall
-
-    ```$ sudo ufw allow 20/tcp ```
-    
-    ```$ sudo ufw allow 20/tcp ```
-
-
-
+<br>
 
 # PicoCTF Suryo 
 ## Iris-Name-Repo-1
