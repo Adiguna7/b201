@@ -9,7 +9,30 @@
 <br>
 
 ## 2. Install Samba
+1. ```$ sudo apt update```
 
+2. ```$ sudo apt install samba```
+
+3. add user ke samba <br>
+    ```$ sudo smbpasswd -a $user```
+
+4. enable samba user <br>
+    ```$ sudo smbpasswd -e $user```
+
+5. ```$ sudo chown $user /home/sadewa```
+
+6. ```$ sudo nano /etc/samba/smb.conf```
+
+7. Tambahkan <br>
+    [home] <br>
+    comment = Samba Server <br>
+    path = /home/sadewa/ <br>
+    read only = no <br>
+    browsable = yes <br>
+    valid users = $user
+
+8. restart samba <br>
+    ```$ sudo systemctl restart smbd```
 
 <br>
 
