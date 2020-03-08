@@ -178,6 +178,85 @@
 
     dan saat dimasukkan ke halaman login maka akan muncul flag
 
+<br>
+<br>
+<br>
+
+# PicoCTF Banin
+## Easy1
+        A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    +----------------------------------------------------
+    A | A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    B | B C D E F G H I J K L M N O P Q R S T U V W X Y Z A
+    C | C D E F G H I J K L M N O P Q R S T U V W X Y Z A B
+    D | D E F G H I J K L M N O P Q R S T U V W X Y Z A B C
+    E | E F G H I J K L M N O P Q R S T U V W X Y Z A B C D
+    F | F G H I J K L M N O P Q R S T U V W X Y Z A B C D E
+    G | G H I J K L M N O P Q R S T U V W X Y Z A B C D E F
+    H | H I J K L M N O P Q R S T U V W X Y Z A B C D E F G
+    I | I J K L M N O P Q R S T U V W X Y Z A B C D E F G H
+    J | J K L M N O P Q R S T U V W X Y Z A B C D E F G H I
+    K | K L M N O P Q R S T U V W X Y Z A B C D E F G H I J
+    L | L M N O P Q R S T U V W X Y Z A B C D E F G H I J K
+    M | M N O P Q R S T U V W X Y Z A B C D E F G H I J K L
+    N | N O P Q R S T U V W X Y Z A B C D E F G H I J K L M
+    O | O P Q R S T U V W X Y Z A B C D E F G H I J K L M N
+    P | P Q R S T U V W X Y Z A B C D E F G H I J K L M N O
+    Q | Q R S T U V W X Y Z A B C D E F G H I J K L M N O P
+
+* UFJKXQZQUNB dengan kunci SOLVECRYPTO kita bisa       menyambungkan satu - satu menggunakan tabel diatas
+    - S - U = C
+    - O - F = R
+    - L - J = Y
+    - V - K = P
+    - E - X = T
+    - C - Q = O
+    - R - Z = I
+    - Y - Q = S
+    - P - U = F
+    - T - N = U
+    - O - B = N
+* jadi flag nya adalah  `picoCTF{CRYPTOISFUN}`
+
+## What's a net cat?
+* `nc 2019shell1.picoctf.com 12265 | grep -oE "picoCTF{.*}" --color=none`
+* setelah menggunakan command itu di terminal untuk netcat, muncul flag nya `picoCTF{nEtCat_Mast3ry_74df27a3}`
+
+## Where are the robots
+* "There is data encoded somewhere, there might be an online decoder"
+* setelah browsing tentang png online decoder, salah satunya adalah zsteg (untuk di terminal)
+* `zsteg buildings.png | grep -o "picoCTF{.*}" --color=none`
+* ketemu flag nya, `picoCTF{h1d1ng_1n_th3_b1t5}`
+
+## First Grep: Part II
+* membuka directory `/problems/first-grep--part-ii_2_1c866f894e7ef69b77a69a224b0c3f60/files di shell picoctf`
+* `grep -r "picoCTF{.*}" --color=none` 
+* menggunakan `-r` untuk rekursif
+
+## Flags
+![](Images/flag(flags).png)
+* setelah browsing menggunakan google image search, ketemu bahwa itu adalah bendera sinyal angkatan laut atau Navy Nautical Flags
+* setelah diterjemagkan satu - satu, ketemu flagnya `PICOCTF{F1AG5AND5TUFF}`
+
+## like1000
+* berisi sebuah file `1000.tar` jika di extract menggunakan command `tar -xf 1000.tar` maka akan muncul file `999.tar`
+* jika file `999.tar` di extract maka akan muncul file `998.tar` dan seterusnya
+* Hint : "Try and script this, it'll save you alot of time", jadi extract menggunakan rekursif bash
+* `for ((i = 1000; i > 0; i--)); do
+	if [ ! -f "$i.tar" ]; then
+		break;
+	fi	
+	tar -xvf $i.tar
+	rm $i.tar
+done`
+* setelah command itu dijalankan, maka file `.tar` automatis ke extract sampai file `1.tar` dan sebuah file png
+![](Images/flag(like1000).png)
+* flagnya adalah `picoCTF{l0t5_0f_TAR5}`
+
+
+
+
+
 
 
 
