@@ -1,5 +1,5 @@
 <?php
-define('BASEURL', 'http://localhost/sewaja/public');
+define('BASEURL', 'http://localhost:90/');
 
 define('DB_HOST', 'b201-db');
 define('DB_USER', 'root');

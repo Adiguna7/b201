@@ -36,6 +36,9 @@ class Database{
     public function bind($param, $value, $type = NULL){
         if(is_null($type)){
             switch(true){
+                case is_string($value):
+                    $type = PDO::PARAM_STR;
+                break;
                 case is_int($value):
                     $type = PDO::PARAM_INT;
                 break;
@@ -51,7 +54,7 @@ class Database{
     }
 
     public function execute(){
-        $this->stmt->execute;        
+        $this->stmt->execute();        
     }
 
     public function resultSet(){
@@ -62,6 +65,10 @@ class Database{
     public function resultSingle(){
         $this->stmt->execute();
         return $this->stmt->fetch();
+    }
+
+    public function rowCount(){
+        return $this->stmt->rowCount();
     }
 }
 
