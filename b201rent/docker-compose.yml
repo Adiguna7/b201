@@ -13,9 +13,10 @@ services:
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: dev
-    working_dir: /var/www
+    working_dir: /
     volumes:
       - ./:/var/www
+      - ./php/tmp:/tmp
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network

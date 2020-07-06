@@ -13,8 +13,8 @@
 
     <!-- My CSS -->
     <link rel="stylesheet" href="<?=BASEURL?>css/login-register.css" />
-    <link rel="shortcut icon" href="<?=BASEURL?>img/logo.png" type="image/x-icon">
-    <title> <?= $data['title'] ?> | Mage 6</title>
+    <link rel="shortcut icon" href="<?=BASEURL?>img/logo.png" type="image/x-icon">    
+    <title> <?= $data['title'] ?> | B201Rent</title>
   </head>
 
   <body>

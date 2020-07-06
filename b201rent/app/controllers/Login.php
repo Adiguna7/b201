@@ -1,9 +1,10 @@
 <?php
 class Login extends Controller{
     public function index(){
-        if(isset($_SESSION)){
+        session_start();        
+        if(isset($_SESSION)){            
             session_destroy();
-        }                
+        }                       
         $data['title'] = "Login";
         $this->view('layouts/head', $data);       
         $this->view('login');
@@ -55,6 +56,7 @@ class Login extends Controller{
                     }
                     else{
                         $_SESSION['role'] = "user"; 
+                        $_SESSION['user_name'] = $data_user['user_name'];
                         header("Location: ".BASEURL."home");
                         exit;
                     }
