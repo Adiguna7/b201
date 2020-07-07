@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   
-  <title>Admin Dashboard | MAGE6</title>  
+  <title>Admin Dashboard | B201Rent</title>  
   
 
   <!-- Custom styles for this template-->  

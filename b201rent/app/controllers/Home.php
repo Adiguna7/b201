@@ -2,19 +2,28 @@
 class Home extends Controller{
     public function __construct()
     {   
-        session_start();             
+        session_start();        
+        $now = time();        
+        if (isset($_SESSION['discard_after']) && $now > $_SESSION['discard_after']) {            
+            session_unset();
+            session_destroy();
+            session_start();            
+        }
+        $_SESSION['discard_after'] = $now + 600;        
     }    
     public function index(){                 
         if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
-            $this->view('user/homehead');        
+            $data['title'] = "Welcome";
+            $this->view('user/homehead', $data);        
             $this->view('home', $data);
             return $this->view('user/hometail');
         }
         else{
-            $this->view('user/homehead');        
-            $this->view('home');
+            $data['title'] = "Welcome";
+            $this->view('user/homehead', $data);        
+            $this->view('home', $data);
             return $this->view('user/hometail');
         }               
     }
@@ -23,13 +32,15 @@ class Home extends Controller{
         if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
-            $this->view('user/homehead');        
+            $data['title'] = "Contact";
+            $this->view('user/homehead', $data);        
             $this->view('contact', $data);
             return $this->view('user/hometail');
         }
         else{
-            $this->view('user/homehead');        
-            $this->view('contact');
+            $data['title'] = "Contact";
+            $this->view('user/homehead', $data);        
+            $this->view('contact', $data);
             return $this->view('user/hometail');
         }                
     }
@@ -55,14 +66,16 @@ class Home extends Controller{
             $data['judul'] = "All Category";
             $data['items'] = $this->model('ItemsModel')->getAll();
             // var_dump($data['jumlah']);
-            $this->view('user/homehead');        
+            $data['title'] = "Category";
+            $this->view('user/homehead', $data);        
             $this->view('category', $data);
             return $this->view('user/hometail');
         }
-        else{
+        else{        
+            $data['title'] = "Category";
             $data['judul'] = $category;
             $data['items'] = $this->model('ItemsModel')->getFromCategory($category);            
-            $this->view('user/homehead');        
+            $this->view('user/homehead', $data);        
             $this->view('category', $data);
             return $this->view('user/hometail');
         }        
@@ -82,8 +95,9 @@ class Home extends Controller{
             if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
                 $data['role'] = $_SESSION['role'];
                 $data['user_name'] = $_SESSION['user_name'];
-            }            
-            $this->view('user/homehead');
+            }
+            $data['title'] = "Itemdetail";            
+            $this->view('user/homehead', $data);
             $this->view('itemdetail', $data);
             return $this->view('user/hometail');
         }        
@@ -107,7 +121,8 @@ class Home extends Controller{
                 }
                 $data['sessionstatus'] = $_SESSION['status'];
                 // var_dump($data['sessionstatus']);
-                $this->view('user/homehead');
+                $data['title'] = "Cart";
+                $this->view('user/homehead', $data);
                 $this->view('cart', $data);
                 return $this->view('user/hometail');
             }
@@ -154,7 +169,8 @@ class Home extends Controller{
                 $data['latecharge'] = "Anda Sudah Melampaui Batas Pengembalian Barang Denda Anda Sebesar " . $charge . " Rupiah.";
             }
             // var_dump($data['history']);            
-            $this->view('user/homehead');
+            $data['title'] = "History";
+            $this->view('user/homehead', $data);
             $this->view('history', $data);
             return $this->view('user/hometail');
         }        
