@@ -13,9 +13,9 @@
         return $this->db->resultSet();
      }
 
-     public function addUser($data){      
+     public function addUser($data){         
          $query = "INSERT INTO ". $this->table ." VALUES (NULL, :user_name, :user_email, :user_nrp, :user_phone, :user_password, NULL, NULL)";         
-         // var_dump($query);
+         // var_dump($query);         
          $hashpassword = password_hash($_POST['password'], PASSWORD_BCRYPT);
          $this->db->query($query);
          // var_dump($data['name']);
@@ -37,8 +37,9 @@
      }
 
      public function checkUsername($username){
-        $query = "SELECT user_name FROM " . $this->table . " WHERE user_name = '$username'";
+        $query = "SELECT user_name FROM " . $this->table . " WHERE user_name = :username";        
         $this->db->query($query);              
+        $this->db->bind('username', $username);
         return $this->db->resultSingle();
      }
 
@@ -50,8 +51,9 @@
       }
       
       public function getbyUsername($username){
-         $query = "SELECT * FROM " . $this->table . " WHERE user_name = '$username'";
+         $query = "SELECT * FROM " . $this->table . " WHERE user_name = :username";
          $this->db->query($query);
+         $this->db->bind('username', $username);
          return $this->db->resultSingle();
       }
  }

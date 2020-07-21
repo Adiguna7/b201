@@ -11,12 +11,20 @@ class ComposerStaticInit261901482e9baec4ff76198723151b03
         array (
             'PHPMailer\\PHPMailer\\' => 20,
         ),
+        'E' => 
+        array (
+            'Eusonlito\\Captcha\\' => 18,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'Eusonlito\\Captcha\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/eusonlito/captcha/src',
         ),
     );
 

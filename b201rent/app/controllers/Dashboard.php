@@ -3,6 +3,7 @@
 class Dashboard extends Controller{
     public function __construct()
     {
+        ini_set( 'session.cookie_httponly', 1 );
         session_start();
         if($_SESSION == NULL){
             header('Location: '.BASEURL.'login');

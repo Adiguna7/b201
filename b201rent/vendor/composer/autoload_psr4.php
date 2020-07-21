@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
+    'Eusonlito\\Captcha\\' => array($vendorDir . '/eusonlito/captcha/src'),
 );

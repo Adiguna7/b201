@@ -12,6 +12,7 @@
             <form class="text-center" action="<?=BASEURL?>register/add" method="POST">
               <h1 class="header">Register</h1>
               <p style="color: red;"><?= $data['error']?></p>
+              <input type="hidden" name="csrf_token" value="<?=$data['csrf']?>">
               <div class="form-group">
                 <input
                   name="name"
@@ -46,7 +47,7 @@
                   aria-describedby="emailHelp"
                   placeholder="Email"
                   autocomplete="off"
-                  maxlength="20"
+                  maxlength="30"
                   required
                 />
               </div>
@@ -82,7 +83,15 @@
                   placeholder="Password Confirmation"
                   required
                 />
-              </div>
+              </div>              
+              <div class="form-group">
+                <img class="img-fluid" src="<?=$data['captcha']?>" alt="" srcset="">
+                <div class="row justify-content-center">
+                  <div class="col-6">
+                    <input type="text" minlength="5" maxlength="5" name="<?=$data['captcha_name']?>" id="" placeholder="Verify Captcha" class="form-control mt-3">
+                  </div>
+                </div>                
+              </div>          
               <button type="submit" class="btn gradient-2 mx-auto">
                 Submit
               </button>

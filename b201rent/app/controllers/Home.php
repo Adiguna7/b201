@@ -1,12 +1,13 @@
 <?php
 class Home extends Controller{
     public function __construct()
-    {   
+    {   ini_set( 'session.cookie_httponly', 1 );
         session_start();        
         $now = time();        
         if (isset($_SESSION['discard_after']) && $now > $_SESSION['discard_after']) {            
             session_unset();
             session_destroy();
+            ini_set( 'session.cookie_httponly', 1 );
             session_start();            
         }
         $_SESSION['discard_after'] = $now + 600;        
@@ -166,6 +167,7 @@ class Home extends Controller{
                 $different_time = ($datenowtime - $dateendtime)/60/60/24;
                 // var_dump($dateendtime);
                 $charge = $different_time * $data['history']['item_charge'];
+                // var_dump($data['history']['item_charge']);
                 $data['latecharge'] = "Anda Sudah Melampaui Batas Pengembalian Barang Denda Anda Sebesar " . $charge . " Rupiah.";
             }
             // var_dump($data['history']);            
