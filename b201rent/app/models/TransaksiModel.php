@@ -54,7 +54,7 @@
         }
 
         public function getTimeEndSingle($userid){
-            $query = "SELECT transaksi_end FROM " . $this->table . " WHERE userId = '$userid' AND transaksi_status <> 'done'" ;
+            $query = "SELECT i.item_charge, t.transaksi_end FROM transaksi t, items i WHERE userId = '$userid' AND transaksi_status <> 'done' AND i.item_id = t.item_id" ;
             $this->db->query($query);
             return $this->db->resultSingle();            
         }

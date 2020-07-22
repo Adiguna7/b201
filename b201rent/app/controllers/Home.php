@@ -1,4 +1,8 @@
 <?php
+
+// use Carbon\Carbon;
+
+// require '../vendor/autoload.php';
 class Home extends Controller{
     public function __construct()
     {   ini_set( 'session.cookie_httponly', 1 );
@@ -158,18 +162,22 @@ class Home extends Controller{
             $data['user_name'] = $_SESSION['user_name'];
             $data['user'] = $this->model('UsersModel')->getByUsername($data['user_name']);
             $data['history'] = $this->model('TransaksiModel')->getByUseridHistory($data['user']['userId']);            
-            $data['endtime'] = $this->model('TransaksiModel')->getTimeEndSingle($data['user']['userId']);
+            $data['endcharge'] = $this->model('TransaksiModel')->getTimeEndSingle($data['user']['userId']);
             $datenow = date('Y-m-d');
             $datenowtime = strtotime($datenow);            
-            $dateendtime = strtotime($data['endtime']['transaksi_end']);        
-            // $datenowtanggal = date('d');                    
-            if($datenowtime > $dateendtime){                                
-                $different_time = ($datenowtime - $dateendtime)/60/60/24;
-                // var_dump($dateendtime);
-                $charge = $different_time * $data['history']['item_charge'];
-                // var_dump($data['history']['item_charge']);
-                $data['latecharge'] = "Anda Sudah Melampaui Batas Pengembalian Barang Denda Anda Sebesar " . $charge . " Rupiah.";
-            }
+            $dateendtime = strtotime($data['endcharge']['transaksi_end']);        
+            // $datenowtanggal = date('d');
+            // var_dump($data['endcharge']);
+            $data['latecharge'] = '';
+            if($data['endcharge']){
+                if($datenowtime > $dateendtime){                                
+                    $different_time = ($datenowtime - $dateendtime)/60/60/24;
+                    // var_dump($different_time);
+                    $charge = $different_time * $data['endcharge']['item_charge'];
+                    // var_dump($data['endcharge']['item_charge']);
+                    $data['latecharge'] = "Anda Sudah Melampaui Batas Pengembalian Barang Denda Anda Sebesar " . $charge . " Rupiah.";
+                }
+            }                                
             // var_dump($data['history']);            
             $data['title'] = "History";
             $this->view('user/homehead', $data);
@@ -182,14 +190,12 @@ class Home extends Controller{
         }
     }
 
-    public function test(){
-        // $datenow = date('d');
-        $date = strtotime('2020-07-07');
-        $tanggal =  strtotime(date('Y-m-d'));
-    
-        // $datenowtanggal = date('d');
-        $differentday = ($tanggal - $date)/60/60/24;
-        echo $differentday;     
+    public function test(){        
+        date_default_timezone_set("Asia/Jakarta");            
+        $time = strtotime(date('Y-m-d H:i:s'));
+        $startTime = date("Y-m-d H:i:s");
+        $endTime = date("Y-m-d H:i:s", strtotime('+30 minutes', $time));
+        var_dump($startTime);     
     }    
 }
 ?>

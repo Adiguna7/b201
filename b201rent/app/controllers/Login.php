@@ -1,6 +1,10 @@
 <?php
 
 use Eusonlito\Captcha\Captcha;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 require '../vendor/autoload.php';
 
 class Login extends Controller{    
@@ -41,9 +45,9 @@ class Login extends Controller{
                         unset($_SESSION['checking']);
                     }
                     break;
-                case 'wrongpassword':
-                    if($_SESSION['checking'] == "wrongpassword"){
-                        $data['error'] = "Username Atau Password Salah";
+                case 'successchangepassword':
+                    if($_SESSION['checking'] == "successchangepassword"){
+                        $data['error'] = "Anda Berhasil Mengubah Password Anda, Silahkan Login";
                         unset($_SESSION['checking']);
                     }
                     break;
@@ -70,7 +74,13 @@ class Login extends Controller{
                         $data['error'] = "Berhasil Register, Silahkan Verifikasi Account Via Email";
                         unset($_SESSION['checking']);
                     }
-                    break;                                                    
+                    break;
+                case 'lockaccount':
+                    if($_SESSION['checking'] == "lockaccount"){
+                        $data['error'] = "Akun Anda Sedang Dalam Lock Account, Tidak Bisa Diakses Dalam 30 Menit. Konfirmasi Email Untuk Menghapusnya.";
+                        unset($_SESSION['checking']);
+                    }
+                    break;                                                                        
                 default:                                
                     $data['error'] = '';
                 break;
@@ -90,6 +100,7 @@ class Login extends Controller{
     // Method For Verify Account
     public function verify($email, $hash){
         // echo "pass";
+        session_start();
         $secret = "35onoi2=-7#%g03kl";
         $emaildecode = urldecode($email);
         if(md5($emaildecode.$secret) == $hash){
@@ -125,24 +136,72 @@ class Login extends Controller{
                             }
                             else{
                                 // ini_set( 'session.cookie_httponly', 1 );
-                                session_start();                      
-                                if($data_user['is_admin']){                                                
-                                    $_SESSION['role'] = "admin";
-                                    $_SESSION['user_name'] = $data_user['user_name'];                                                                                                                 
-                                    header("Location: ".BASEURL."dashboard");
-                                    exit;                        
+                                date_default_timezone_set("Asia/Jakarta");
+                                $timenow = date("Y-m-d H:i:s");          
+                                if($this->model('FailedModel')->getCheckOneUser($data_user['userId'], $timenow)){
+                                    $_SESSION['checking'] = "lockaccount";
+                                    return header('Location: '. BASEURL . 'login/index/lockaccount');
+                                    
                                 }
                                 else{
-                                    $_SESSION['role'] = "user"; 
-                                    $_SESSION['user_name'] = $data_user['user_name'];
-                                    header("Location: ".BASEURL."home");
-                                    exit;
-                                }
+                                    session_start();                      
+                                    if($data_user['is_admin']){                                                
+                                        $_SESSION['role'] = "admin";
+                                        $_SESSION['user_name'] = $data_user['user_name'];                                                                                                                 
+                                        header("Location: ".BASEURL."dashboard");
+                                        exit;                        
+                                    }
+                                    else{
+                                        $_SESSION['role'] = "user"; 
+                                        $_SESSION['user_name'] = $data_user['user_name'];
+                                        header("Location: ".BASEURL."home");
+                                        exit;
+                                    }
+                                }                                
                             }
                         }
                         else{
+                            if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+                                session_destroy();
+                            }                            
+                            $_SESSION['token'] = bin2hex(random_bytes(32));
                             $_SESSION['checking'] = "wrongpassword";
-                            return header('Location: '. BASEURL . 'login/index/wrongpassword');
+                            $data['captcha'] = Captcha::source(5, 200, 50);
+                            $data['captcha_name'] = Captcha::sessionName();
+                            $data['csrf'] = $_SESSION['token'];
+                            $data['error'] = "Username Atau Password Salah";
+
+                            // Failed Jobs Control
+                            if($this->model('FailedModel')->getOneUser($data_user['userId'])){
+                                $data_failed = $this->model('FailedModel')->getOneUser($data_user['userId']);                                                            
+                                $attemptnow = $data_failed['attempt']; //store attempt right now
+                                // update data
+                                if($attemptnow >= 7){
+                                    date_default_timezone_set("Asia/Jakarta");
+                                    $timenow = date("Y-m-d H:i:s");          
+                                    if($this->model('FailedModel')->getCheckOneUser($data_user['userId'], $timenow)){
+                                        $data['error'] = "Akun Anda Sedang Dalam Lock Account, Tidak Bisa Diakses Dalam 30 Menit. Konfirmasi Email Untuk Menghapusnya.";
+                                    }
+                                    else{
+                                        $time = strtotime(date('Y-m-d H:i:s'));
+                                        $startTime = date("Y-m-d H:i:s");
+                                        $endTime = date("Y-m-d H:i:s", strtotime('+30 minutes', $time));
+                                        $this->model('FailedModel')->updatebyTime($data_user['userId'], $startTime, $endTime);                                    
+                                    }                                                                        
+                                }
+                                else{
+                                    $this->model('FailedModel')->updatebyAttempt($data_user['userId'], $attemptnow + 1);                                                                
+                                }                                                                
+                            }
+                            else{
+                                $this->model('FailedModel')->insertbyUserid($data_user['userId']);
+                            }                            
+
+                            // var_dump($token);                                                           
+                            $data['title'] = "Login";        
+                            $this->view('layouts/head', $data);       
+                            $this->view('login', $data);
+                            return $this->view('layouts/tail');
                         }
                     }
                     else{
@@ -192,6 +251,224 @@ class Login extends Controller{
         $this->view('layouts/head', $data);        
         $this->view('login', $data);
         return $this->view('layouts/tail'); 
+    }
+
+    public function forgotpassword($error = null){
+        session_start();
+        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+            session_destroy();
+        }
+        // if (empty($_SESSION['token'])) {
+        $_SESSION['token'] = bin2hex(random_bytes(32));
+        $data['captcha'] = Captcha::source(5, 200, 50);
+        $data['captcha_name'] = Captcha::sessionName();
+        $data['csrf'] = $_SESSION['token'];
+        $data['error'] = '';
+        // data error control
+
+        if($error != null){
+            switch ($error) {
+                case 'emailnotfound':
+                    if($_SESSION['checking'] == "emailnotfound"){
+                        $data['error'] = "Email Tidak Terdaftar";    
+                        unset($_SESSION['checking']);
+                    }                                                            
+                    break;
+                case 'failedresetpassword':
+                    if($_SESSION['checking'] == "failedresetpassword"){
+                        $data['error'] = "Password Gagal Direset Silahkan Mencoba Kembali";    
+                        unset($_SESSION['checking']);
+                    }                                                            
+                    break;
+                case 'successemailreset':
+                    if($_SESSION['checking'] == "successemailreset"){
+                        $data['error'] = "Email Berhasil Dikirim, Silahkan Reset Password Anda Melalui Link yang Kami Kirimkan";    
+                        unset($_SESSION['checking']);
+                    }                                                            
+                    break;                
+                default:
+                    $data['error'] = '';
+                    break;
+            }
+        }
+
+        $data['title'] = "Forgot Password";
+        $this->view('layouts/head', $data);        
+        $this->view('forgotpassword', $data);
+        return $this->view('layouts/tail');
+    }
+
+    public function sendemailforgot(){
+        session_start();
+        if(isset($_POST['email'])){
+            if (!empty($_POST['csrf_token'])) {
+                if (hash_equals($_SESSION['token'], $_POST['csrf_token'])) {
+                    if($this->model('UsersModel')->getbyUseremail($_POST['email'])){                        
+                        $data_user = $this->model('UsersModel')->getbyUseremail($_POST['email']);
+                        $remembertoken = $this->generaterandomstring(13);
+                        // insert data
+                        if(!$this->model('ForgotModel')->selectbyId($data_user['userId'])){
+                            $this->model('ForgotModel')->insert($data_user['userId'], $remembertoken);                        
+                        }
+                        else{
+                            $this->model('ForgotModel')->update($data_user['userId'], $remembertoken);
+                        }
+                        $salt = "`/?;19as\]";
+                        $hash = sha1($_POST['email'] . $salt);
+                        
+                        $mail = new PHPMailer(true);                        
+                        $link = BASEURL . "login/resetpassword/" . $hash . "/" . $data_user['userId'] . "/" . $remembertoken;
+
+                        try {
+                            // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      // Enable verbose debug output
+                            $mail->isSMTP();                                            // Send using SMTP
+                            $mail->Host       = 'smtp.googlemail.com';                    // Set the SMTP server to send through
+                            $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+                            $mail->Username   = 'emailtestuntukbasdat123@gmail.com';                     // SMTP username
+                            $mail->Password   = '123@gmail';                               // SMTP password
+                            $mail->SMTPSecure = 'tls';         // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
+                            $mail->Port       = 587;
+
+                            $mail->setFrom('b201@its.ac.id', 'B201Rent');
+                            $mail->addAddress($_POST['email']);     // Add a recipient                    
+                            // $mail->addReplyTo('info@example.com', 'Information');
+                            // $mail->addCC('cc@example.com');
+                            // $mail->addBCC('bcc@example.com');
+
+                            $mail->isHTML(true);                                  // Set email format to HTML
+                            $mail->Subject = 'Reset Password Link';
+                            $mail->Body    = "Silahkan akses link ini untuk reset password " . $link;
+                            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+                            $mail->send();
+                                                         
+                            $_SESSION['checking'] = "successemailreset";
+                            $_SESSION['security'] = "`[/[-`=;/]";                           
+                            return header('Location: '. BASEURL . 'login/forgotpassword/successemailreset');
+
+                        } catch (Exception $e) {
+                                session_start();
+                                $_SESSION['checking'] = "failedresetpassword";
+                                header("Location: " . BASEURL . "login/forgotpassword/failedresetpassword");
+                                exit();             
+                        }
+                    }
+                    else{
+                        $_SESSION['checking'] = "emailnotfound";
+                        return header('Location: '. BASEURL . 'login/forgotpassword/emailnotfound');                
+                    }
+                }
+                else{
+                    http_response_code(401);
+                    die();
+                }
+            }
+            else{
+                http_response_code(401);
+                die(); 
+            }                        
+        }
+        else{
+            http_response_code(401);
+            die();        
+        }        
+    }
+
+    public function resetpassword($hashemail, $id, $remembertoken){
+        $data_user_forgot = $this->model('ForgotModel')->selectbyId($id);
+        $data_user_users = $this->model('UsersModel')->getbyId($id);
+        $salt = "`/?;19as\]";
+        $hash = sha1($data_user_users['user_email'] . $salt);
+        if($hash == $hashemail && $data_user_forgot['remember_token'] == $remembertoken){
+            session_start();
+            if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+                session_destroy();
+            }
+            // if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+            // }
+            $data['captcha'] = Captcha::source(5, 200, 50);
+            $data['captcha_name'] = Captcha::sessionName();
+            $data['csrf'] = $_SESSION['token'];
+            $data['error'] = '';
+            $data['user_id'] = $data_user_users['userId'];            
+                                    
+            $data['title'] = "Reset Password";
+            $this->view('layouts/head', $data);        
+            $this->view('resetpassword', $data);
+            return $this->view('layouts/tail');
+        }
+        else{
+            http_response_code(404);
+            die(); 
+        }        
+        
+    }
+
+    public function changepassword(){
+        session_start();
+        if(isset($_POST['newpassword']) && isset($_POST['retypepassword'])){
+            if (!empty($_POST['csrf_token'])) {
+                if (hash_equals($_SESSION['token'], $_POST['csrf_token']) && isset($_POST['userid'])) {                    
+                    $data_user = $this->model('UsersModel')->getbyId($_POST['userid']);                    
+                    if($_POST['newpassword'] == $_POST['retypepassword']){
+                        if($this->model('UsersModel')->updatePassword($_POST['userid'], $_POST['newpassword'])){
+                            $this->model('ForgotModel')->deletebyId($_POST['userid']);
+                            $_SESSION['checking'] = "successchangepassword";
+                            return header('Location: '. BASEURL . 'login/index/successchangepassword');
+                        }
+                        else{
+                            http_response_code(500);
+                            die();         
+                        }
+                    }
+                    else{
+                        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+                            session_destroy();
+                        }
+                        // if (empty($_SESSION['token'])) {
+                        $_SESSION['token'] = bin2hex(random_bytes(32));
+                        // }                            
+                        $data['csrf'] = $_SESSION['token'];
+                        $data['error'] = 'Retype Password Tidak Sama';
+                        $data['user_id'] = $data_user['userId'];            
+                                                
+                        $data['title'] = "Reset Password";
+                        $this->view('layouts/head', $data);        
+                        $this->view('resetpassword', $data);
+                        return $this->view('layouts/tail');
+                    }                                                                   
+                }
+                else{
+                    http_response_code(401);
+                    die();         
+                }
+            }
+            else{
+                http_response_code(401);
+                die(); 
+            }
+        }
+        else{
+            http_response_code(401);
+            die(); 
+        }
+    }
+
+    private function generaterandomstring($length) {
+        if($length == null){
+            http_response_code(401);
+            die();
+        }
+        else{
+            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $charactersLength = strlen($characters);
+            $randomString = '';
+            for ($i = 0; $i < $length; $i++) {
+                $randomString .= $characters[rand(0, $charactersLength - 1)];
+            }
+            return $randomString;
+        }           
     }
 }
 ?>

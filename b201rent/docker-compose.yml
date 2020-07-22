@@ -15,8 +15,7 @@ services:
       SERVICE_TAGS: dev
     working_dir: /
     volumes:
-      - ./:/var/www
-      - ./php/tmp:/tmp
+      - ./:/var/www      
       - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network

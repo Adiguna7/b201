@@ -58,6 +58,12 @@ class Register extends Controller{
                         unset($_SESSION['checking']);
                     }
                     break;
+                case 'emailtaken':
+                    if($_SESSION['checking'] == "emailtaken"){
+                        $data['error'] = "Email Sudah Digunakan, Silahkan Masukkan Ulang";
+                        unset($_SESSION['checking']);
+                    }
+                    break;
                 case 'passnotsame':
                     if($_SESSION['checking'] == "passnotsame"){
                         $data['error'] = "Password Tidak Sama";
@@ -123,6 +129,10 @@ class Register extends Controller{
                         else if($this->model('UsersModel')->checkUsername($_POST['name']) > 0){
                             $_SESSION['checking'] = "usernametaken";
                             return header('Location: '. BASEURL . 'register/index/usernametaken');                                                                            
+                        }
+                        else if($this->model('UsersModel')->getbyUseremail($email)){
+                            $_SESSION['checking'] = "emailtaken";
+                            return header('Location: '. BASEURL . 'register/index/emailtaken');                                                                            
                         }
                         else if(filter_var($email, FILTER_VALIDATE_EMAIL) && filter_var($name, FILTER_SANITIZE_STRING)){
                             if($this->model('UsersModel')->addUser($_POST) > 0){
