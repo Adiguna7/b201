@@ -11,7 +11,7 @@ class Login extends Controller{
     public function index($error = null){
         ini_set( 'session.cookie_httponly', 1 );
         session_start();
-        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+        if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
             session_destroy();
         }
         // if (empty($_SESSION['token'])) {
@@ -144,7 +144,9 @@ class Login extends Controller{
                                     
                                 }
                                 else{
-                                    session_start();                      
+                                    session_start();
+                                    // var_dump($data_user['userId']);
+                                    $this->model('FailedModel')->deletebyId($data_user['userId']);                      
                                     if($data_user['is_admin']){                                                
                                         $_SESSION['role'] = "admin";
                                         $_SESSION['user_name'] = $data_user['user_name'];                                                                                                                 
@@ -161,7 +163,7 @@ class Login extends Controller{
                             }
                         }
                         else{
-                            if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+                            if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
                                 session_destroy();
                             }                            
                             $_SESSION['token'] = bin2hex(random_bytes(32));
@@ -232,7 +234,7 @@ class Login extends Controller{
 
     public function sendmailfailed($user_email){
         session_start();
-        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+        if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
             session_destroy();
         }
         // if (empty($_SESSION['token'])) {
@@ -255,7 +257,7 @@ class Login extends Controller{
 
     public function forgotpassword($error = null){
         session_start();
-        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+        if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
             session_destroy();
         }
         // if (empty($_SESSION['token'])) {
@@ -379,9 +381,9 @@ class Login extends Controller{
         $data_user_users = $this->model('UsersModel')->getbyId($id);
         $salt = "`/?;19as\]";
         $hash = sha1($data_user_users['user_email'] . $salt);
-        if($hash == $hashemail && $data_user_forgot['remember_token'] == $remembertoken){
+        if(hash_equals($hash, $hashemail) && $data_user_forgot['remember_token'] === $remembertoken){
             session_start();
-            if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+            if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
                 session_destroy();
             }
             // if (empty($_SESSION['token'])) {
@@ -409,39 +411,77 @@ class Login extends Controller{
         session_start();
         if(isset($_POST['newpassword']) && isset($_POST['retypepassword'])){
             if (!empty($_POST['csrf_token'])) {
-                if (hash_equals($_SESSION['token'], $_POST['csrf_token']) && isset($_POST['userid'])) {                    
-                    $data_user = $this->model('UsersModel')->getbyId($_POST['userid']);                    
-                    if($_POST['newpassword'] == $_POST['retypepassword']){
-                        if($this->model('UsersModel')->updatePassword($_POST['userid'], $_POST['newpassword'])){
-                            $this->model('ForgotModel')->deletebyId($_POST['userid']);
-                            $_SESSION['checking'] = "successchangepassword";
-                            return header('Location: '. BASEURL . 'login/index/successchangepassword');
+                $data_user = $this->model('UsersModel')->getbyId($_POST['userid']);                    
+                if (hash_equals($_SESSION['token'], $_POST['csrf_token']) && isset($_POST['userid'])) {                                                            
+                    $uppercase = preg_match('@[A-Z]@', $_POST['newpassword']);
+                    $lowercase = preg_match('@[a-z]@', $_POST['newpassword']);
+                    $number    = preg_match('@[0-9]@', $_POST['newpassword']);
+                    $specialChars = preg_match('@[^\w]@', $_POST['newpassword']);
+                    if($uppercase && $lowercase && $number && $specialChars && strlen($_POST['newpassword']) > 8){
+                        if($_POST['newpassword'] === $_POST['retypepassword']){
+                            if($this->model('UsersModel')->updatePassword($_POST['userid'], $_POST['newpassword'])){
+                                $this->model('ForgotModel')->deletebyId($_POST['userid']);
+                                $_SESSION['checking'] = "successchangepassword";
+                                return header('Location: '. BASEURL . 'login/index/successchangepassword');
+                            }
+                            else{
+                                http_response_code(500);
+                                die();         
+                            }
                         }
                         else{
-                            http_response_code(500);
-                            die();         
-                        }
+                            if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
+                                session_destroy();
+                            }
+                            // if (empty($_SESSION['token'])) {
+                            $_SESSION['token'] = bin2hex(random_bytes(32));
+                            // }                            
+                            $data['csrf'] = $_SESSION['token'];
+                            $data['error'] = 'Retype Password Tidak Sama';
+                            $data['user_id'] = $data_user['userId'];            
+                                                    
+                            $data['title'] = "Reset Password";
+                            $this->view('layouts/head', $data);        
+                            $this->view('resetpassword', $data);
+                            return $this->view('layouts/tail');
+                        }   
                     }
                     else{
-                        if(isset($_SESSION['user']) && isset($_SESSION['role'])){            
+                        $_SESSION['checking'] = "newpasswordnotstrength";
+                        if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
                             session_destroy();
                         }
                         // if (empty($_SESSION['token'])) {
                         $_SESSION['token'] = bin2hex(random_bytes(32));
                         // }                            
                         $data['csrf'] = $_SESSION['token'];
-                        $data['error'] = 'Retype Password Tidak Sama';
-                        $data['user_id'] = $data_user['userId'];            
+                        if($_SESSION['checking'] == "newpasswordnotstrength"){
+                            $data['error'] = "Password Harus Setidaknya 8 Karakter dan paling tidak mengandung 1 huruf kecil, 1 huruf besar, 1 angka dan 1 spesial karakter";
+                            $data['user_id'] = $data_user['userId'];
+                            unset($_SESSION['checking']);
+                        }            
                                                 
                         $data['title'] = "Reset Password";
                         $this->view('layouts/head', $data);        
                         $this->view('resetpassword', $data);
                         return $this->view('layouts/tail');
-                    }                                                                   
+                    }                                                                                       
                 }
                 else{
-                    http_response_code(401);
-                    die();         
+                    if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
+                        session_destroy();
+                    }
+                    // if (empty($_SESSION['token'])) {
+                    $_SESSION['token'] = bin2hex(random_bytes(32));
+                    // }                            
+                    $data['csrf'] = $_SESSION['token'];
+                    $data['error'] = 'CSRF Token Expired, Silahkan Buka Lewat Email Lagi';
+                    $data['user_id'] = $data_user['userId'];            
+                                            
+                    $data['title'] = "Reset Password";
+                    $this->view('layouts/head', $data);        
+                    $this->view('resetpassword', $data);
+                    return $this->view('layouts/tail');         
                 }
             }
             else{

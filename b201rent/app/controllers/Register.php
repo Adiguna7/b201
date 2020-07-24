@@ -81,6 +81,12 @@ class Register extends Controller{
                         $data['error'] = "Username Hanya Boleh Terdiri Dari Huruf";
                         unset($_SESSION['checking']);
                     }
+                    break;
+                case 'passnotstrength':
+                    if($_SESSION['checking'] == "passnotstrength"){
+                        $data['error'] = "Password Harus Setidaknya 8 Karakter dan paling tidak mengandung 1 huruf kecil, 1 huruf besar, 1 angka dan 1 spesial karakter";
+                        unset($_SESSION['checking']);
+                    }
                     break;                    
 
                 default:                                
@@ -112,7 +118,11 @@ class Register extends Controller{
                     $name = trim($_POST['name']);         
                     $name = stripslashes($name);
                     $email = trim($_POST['email']);       
-                    $email = stripslashes($email); 
+                    $email = stripslashes($email);
+                    $uppercase = preg_match('@[A-Z]@', $_POST['password']);
+                    $lowercase = preg_match('@[a-z]@', $_POST['password']);
+                    $number    = preg_match('@[0-9]@', $_POST['password']);
+                    $specialChars = preg_match('@[^\w]@', $_POST['password']); 
                     if (isset($_POST['password']) && isset($_POST['name']) && isset($_POST['nrp']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['passconfirm'])) {            
                         if(!filter_var($name, FILTER_SANITIZE_STRING)){
                             $_SESSION['checking'] = "wrongusername";
@@ -121,6 +131,10 @@ class Register extends Controller{
                         else if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                             $_SESSION['checking'] = "wrongemail";
                             return header('Location: '. BASEURL . 'register/index/wrongemail');                
+                        }
+                        elseif(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_POST['password']) < 8){
+                            $_SESSION['checking'] = "passnotstrength";
+                            return header('Location: '. BASEURL . 'register/index/passnotstrength');
                         }            
                         else if($_POST['password'] != $_POST['passconfirm']){
                             $_SESSION['checking'] = "passnotsame";

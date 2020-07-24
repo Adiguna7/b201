@@ -49,5 +49,13 @@
             $this->db->execute();
             return $this->db->rowCount();
         }
+
+        public function deletebyId($userid){
+            $query = "DELETE FROM " . $this->table . " WHERE userId = :userid";
+            $this->db->query($query);
+            $this->db->bind('userid', $userid);
+            $this->db->execute();
+            return $this->db->rowCount();
+        }
     }
 ?>

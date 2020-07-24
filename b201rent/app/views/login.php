@@ -48,7 +48,7 @@
                 Submit
               </button>              
               <p>No Account Yet? <a href="<?=BASEURL?>register">Register</a></p>
-              <p>Forgot Password? <a href="<?=BASEURL?>login/forgotpassword">Forgot</a></p>
+              <p>Forgot Password? <a href="<?=BASEURL?>login/forgotpassword">Reset</a></p>
             </form>
           </div>
         </div>

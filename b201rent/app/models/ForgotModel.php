@@ -44,7 +44,8 @@
             $query = "DELETE FROM " . $this->table . " WHERE userId = :userid";
             $this->db->query($query);
             $this->db->bind('userid', $userid);
-            return $this->db->resultSingle();
+            $this->db->execute();
+            return $this->db->rowCount();
          }
 
     }

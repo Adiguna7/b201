@@ -25,6 +25,9 @@ class Home extends Controller{
             $this->view('home', $data);
             return $this->view('user/hometail');
         }
+        elseif(isset($_SESSION['role']) && $_SESSION['role'] == "admin"){            
+            header("Location: ". BASEURL . "dashboard");
+        }
         else{
             $data['title'] = "Welcome";
             $this->view('user/homehead', $data);        
@@ -88,7 +91,7 @@ class Home extends Controller{
 
     public function itemdetail($id = null){
         // $data = "";        
-        if($id == null){
+        if($id == null || $this->model('ItemsModel')->getById($id) == NULL){
             header("Location: " . BASEURL . "home/category");
             exit();
         }
@@ -121,7 +124,8 @@ class Home extends Controller{
                 $data['userid'] = $data['user']['userId'];
                 $data['item'] = $this->model('ItemsModel')->getById($itemid);
                 $data['status'] = $this->model('TransaksiModel')->getStatus($data['userid']);
-                if($data['status']['transaksi_status'] == "done" || $data['status']['transaksi_status'] == null){
+                // var_dump($data['status']);
+                if(!$data['status']){
                     $_SESSION['status'] = "pass";                    
                 }
                 $data['sessionstatus'] = $_SESSION['status'];
@@ -142,7 +146,17 @@ class Home extends Controller{
         if(isset($_POST['itemid']) && isset($_POST['userid']) && $_SESSION['status'] == "pass" && $_SESSION['role'] == "user" && isset($_SESSION['user_name'])){
             $data['item'] = $this->model('ItemsModel')->getById($_POST['itemid']);
             $maxrent = $data['item']['item_maxrent'];
-            if($this->model('TransaksiModel')->addData($_POST['userid'], $_POST['itemid'], $maxrent)){                
+            if($this->model('TransaksiModel')->addData($_POST['userid'], $_POST['itemid'], $maxrent)){
+                $itemstock = $this->model('ItemsModel')->getStockById($_POST['itemid']);
+                if($itemstock == 1){
+                    $newstock = $itemstock['item_stock']-1;
+                    $this->model('ItemsModel')->updateStockbyId($_POST['itemid'], $newstock);
+                    $this->model('ItemsModel')->deleteOne($_POST['itemid']);
+                }
+                else{
+                    $newstock = $itemstock['item_stock']-1;
+                    $this->model('ItemsModel')->updateStockbyId($_POST['itemid'], $newstock);
+                }                             
                 unset($_SESSION['status']);
                 header("Location: " . BASEURL . "Home/history");
                 exit();
@@ -174,8 +188,11 @@ class Home extends Controller{
                     $different_time = ($datenowtime - $dateendtime)/60/60/24;
                     // var_dump($different_time);
                     $charge = $different_time * $data['endcharge']['item_charge'];
-                    // var_dump($data['endcharge']['item_charge']);
-                    $data['latecharge'] = "Anda Sudah Melampaui Batas Pengembalian Barang Denda Anda Sebesar " . $charge . " Rupiah.";
+                    $itemlatename = $data['endcharge']['item_name'];
+                    // var_dump($data['endcharge']['item_charge']);                                        
+                    if($itemlatename != NULL && $charge != NULL){                    
+                        $data['latecharge'] = "Anda Sudah Melampaui Batas Peminjaman Dengan Nama '". $itemlatename ."' Denda Anda Sebesar " . $charge . " Rupiah.";
+                    }
                 }
             }                                
             // var_dump($data['history']);            
@@ -191,11 +208,7 @@ class Home extends Controller{
     }
 
     public function test(){        
-        date_default_timezone_set("Asia/Jakarta");            
-        $time = strtotime(date('Y-m-d H:i:s'));
-        $startTime = date("Y-m-d H:i:s");
-        $endTime = date("Y-m-d H:i:s", strtotime('+30 minutes', $time));
-        var_dump($startTime);     
+        echo hex2bin("e306561559aa787d00bc6f70bbdfe3404cf03659e744f8534c00ffb659c4c8740cc942feb2da115a3f415dcbb8607497386656d7d1f34a42059d78f5a8dd1ef");     
     }    
 }
 ?>

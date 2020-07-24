@@ -31,7 +31,7 @@ function setdataitem(dataitem){
         html +=
         '<div class="col-lg-3 col-md-4 col-sm-6 mix oranges fresh-meat">'+
             '<div class="featured__item  animate__animated animate__fadeInUp">'+
-                '<div id="item-image" class="featured__item__pic" style="background-image: url('+css+'); background-size: cover;">'+
+                '<div id="item-image" class="featured__item__pic" style="background-image: url('+css+'); background-size: contain; background-repeat: no-repeat;">'+
                     '<ul class="featured__item__pic__hover">'+                                
                         '<li><a href="' + 'http://localhost:90/home/itemdetail/' + dataitem[i].item_id + '" id="item-info-link"><i class="fa fa-info"></i></a></li>'+                                
                     '</ul>'+

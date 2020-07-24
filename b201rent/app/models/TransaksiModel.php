@@ -9,8 +9,15 @@
             $this->db = new Database;   
         }
 
+        public function getbyId($transaksiid){
+            $query = "SELECT * FROM " . $this->table . " WHERE transaksi_id = :transaksiid";
+            $this->db->query($query);
+            $this->db->bind("transaksiid", $transaksiid);            
+            return $this->db->resultSingle();
+        }
+
         public function getStatus($userid){
-            $query = "SELECT transaksi_status FROM " . $this->table . " WHERE userId = $userid";
+            $query = "SELECT transaksi_status FROM " . $this->table . " WHERE userId = $userid AND transaksi_status <> 'done'";
             // $this->db->bind("userid", $userid);
             // $this->db->bind("itemid", $itemid);
             $this->db->query($query);
@@ -54,7 +61,7 @@
         }
 
         public function getTimeEndSingle($userid){
-            $query = "SELECT i.item_charge, t.transaksi_end FROM transaksi t, items i WHERE userId = '$userid' AND transaksi_status <> 'done' AND i.item_id = t.item_id" ;
+            $query = "SELECT i.item_charge, i.item_name,t.transaksi_end FROM transaksi t, items i WHERE userId = '$userid' AND transaksi_status = 'rent'  AND i.item_id = t.item_id" ;
             $this->db->query($query);
             return $this->db->resultSingle();            
         }

@@ -20,6 +20,14 @@
 
         }
 
+        public function getStockById($id){
+            $query = "SELECT item_stock FROM " . $this->table . " WHERE item_id = :id LIMIT 1";
+            $this->db->query($query);
+            $this->db->bind('id', $id);
+            return $this->db->resultSingle();
+
+        }
+
         public function getCount($category = null){
             if ($category == NULL) {
                 $query = "SELECT COUNT(*) AS jumlah FROM " . $this->table;
@@ -101,7 +109,16 @@
             $this->db->query($query);
             $this->db->execute();
             return $this->db->rowCount();
-        }        
+        }
+        
+        public function updateStockbyId($id, $newitemstock){
+            $query = "UPDATE " . $this->table . " SET item_stock = :newitemstock WHERE item_id = :itemid";
+            $this->db->query($query);
+            $this->db->bind("itemid", $id);
+            $this->db->bind("newitemstock", $newitemstock);
+            $this->db->execute();
+            return $this->db->rowCount();
+        }
 
     }
 ?>

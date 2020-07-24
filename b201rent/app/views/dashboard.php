@@ -99,6 +99,17 @@
             $i = 0;
         ?>            
         <div class="container">
+        <?php if(isset($data['success'])){                  
+        ?>
+          <div class="row">
+            <div class="col-lg-3">
+              <div class="alert alert-success" role="alert">
+                <?=$data['success']?>
+              </div>
+            </div>
+          </div>
+        <?php
+        }?>
           <div class="row">
             <div class="col-lg-12">
 
@@ -211,10 +222,10 @@
                     <td class="text-center align-middle">
                       <div class="row">
                         <div class="col-12">                                                      
-                          <button type="button" class="btn btn-success w-100" data-toggle="modal" data-target="#modalupdate" style="padding: 5px 3px;">Update</button>
+                          <button type="button" class="btn btn-success w-100" data-toggle="modal" data-target="#modalupdate<?=$item['item_id']?>" style="padding: 5px 3px;">Update</button>
                           
                           <!-- Modal UPDATE -->
-                          <div class="modal fade" id="modalupdate" tabindex="-1" role="dialog" aria-labelledby="modalupdatelabel" aria-hidden="true">
+                          <div class="modal fade" id="modalupdate<?=$item['item_id']?>" tabindex="-1" role="dialog" aria-labelledby="modalupdatelabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                               <div class="modal-content">
                                 <div class="modal-header">
@@ -236,11 +247,11 @@
                                       </div>
                                       <div class="form-group">
                                         <select class="form-control" id="itemcategoryid" name="itemcategory" aria-placeholder="item_category" required>                                          
-                                          <option disabled>item_category</option>                                          
-                                          <option <?php if($item['item_id'] == "book"){echo "selected";}?> >Book</option>
-                                          <option <?php if($item['item_id'] == "keyboard"){echo "selected";}?>>Keyboard</option>
-                                          <option <?php if($item['item_id'] == "mouse"){echo "selected";}?>>Mouse</option>
-                                          <option <?php if($item['item_id'] == "monitor"){echo "selected";}?>>Monitor</option>                              
+                                          <option disabled>item_category</option>                                                                              
+                                          <option <?php if($item['item_category'] == "book"){echo "selected";}?> >Book</option>
+                                          <option <?php if($item['item_category'] == "keyboard"){echo "selected";}?>>Keyboard</option>
+                                          <option <?php if($item['item_category'] == "mouse"){echo "selected";}?>>Mouse</option>
+                                          <option <?php if($item['item_category'] == "monitor"){echo "selected";}?>>Monitor</option>                              
                                         </select>
                                       </div>
                                       <div class="form-group">                            

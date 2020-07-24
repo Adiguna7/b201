@@ -178,9 +178,10 @@
                     <div class="shoping__cart__btns">
                         <p>Apabila Status Waiting Silahkan Mengambil Barang di Lab B201 Dengan Membawa Jaminan KTP/KTM</p>
                         <?php
-                        if(isset($data['latecharge'])){
+                        if(isset($data['latecharge']) && $data['latecharge'] != NULL){
                         ?>
-                        <p><?=$data['latecharge']?></p>
+                        <p style="color: red;">* <?=$data['latecharge']?></p>
+                        <p style="color: red;">* Konsekuensi Apabila Barang dan Denda Tidak Dibayar Maka KTP/KTM Tidak Akan Bisa Diambil</p>
                         <?php
                         }
                         ?>

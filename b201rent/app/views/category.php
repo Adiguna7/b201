@@ -151,7 +151,7 @@
                         ?>
                         <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="product__item">
-                                <div class="product__item__pic set-bg" data-setbg="<?=BASEURL?>img/items/<?=$item['item_image']?>">
+                                <div class="product__item__pic set-bg" data-setbg="<?=BASEURL?>img/items/<?=$item['item_image']?>" style="background-size: contain; background-repeat: no-repeat; background-position: center;">
                                     <ul class="product__item__pic__hover">                                                                                
                                         <li><a href="<?=BASEURL?>home/itemdetail/<?=$item['item_id']?>"><i class="fa fa-info"></i></a></li>
                                     </ul>
