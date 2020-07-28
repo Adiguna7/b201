@@ -143,9 +143,18 @@
                         <!-- <div class="product__details__price">$50.00</div> -->
                         <p><?=$data['itemsingle']['item_description']?></p>   
                         <?php
-                        if(isset($_SESSION['user_name']) && $_SESSION['role'] == "user"){                    
+                        if(isset($_SESSION['user_name']) && $_SESSION['role'] == "user"){
+                            if($data['itemsingle']['item_stock'] == 0){                                             
                         ?>
-                        <a href="<?=BASEURL?>home/cart/<?=$data['itemsingle']['item_id']?>" class="primary-btn">RENT</a>
+                            <p style="color: #a32a26;">Barang Sedang Dalam Peminjaman / Out Of Stock</p>
+                            <?php
+                            }
+                            else{                            
+                            ?>
+                            <a href="<?=BASEURL?>home/cart/<?=$data['itemsingle']['item_id']?>" class="primary-btn">RENT</a>
+                            <?php
+                            }
+                            ?>
                         <?php
                         }
                         else{                        

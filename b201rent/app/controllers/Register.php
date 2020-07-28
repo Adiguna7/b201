@@ -88,6 +88,18 @@ class Register extends Controller{
                         unset($_SESSION['checking']);
                     }
                     break;                    
+                case 'wrongnrp':
+                    if($_SESSION['checking'] == "wrongnrp"){
+                        $data['error'] = "NRP Harus Terdiri dari 14 Digit Tidak Kurang dan Tidak Lebih";
+                        unset($_SESSION['checking']);
+                    }
+                    break;
+                case 'wrongphonenumber':
+                    if($_SESSION['checking'] == "wrongphonenumber"){
+                        $data['error'] = "Nomor Telepon Salah, Harus Diawali dengan 08 dan Diikuti 9-11 digit angka";
+                        unset($_SESSION['checking']);
+                    }
+                    break;                                        
 
                 default:                                
                     $data['error'] = '';
@@ -122,15 +134,25 @@ class Register extends Controller{
                     $uppercase = preg_match('@[A-Z]@', $_POST['password']);
                     $lowercase = preg_match('@[a-z]@', $_POST['password']);
                     $number    = preg_match('@[0-9]@', $_POST['password']);
-                    $specialChars = preg_match('@[^\w]@', $_POST['password']); 
+                    $specialChars = preg_match('@[^\w]@', $_POST['password']);
+                    $nrpformat = preg_match('@^([0-9]{14})$@', $_POST['nrp']);
+                    $numberphoneformat = preg_match('@^(08)([0-9]{9,11})$@', $_POST['phone']); 
                     if (isset($_POST['password']) && isset($_POST['name']) && isset($_POST['nrp']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['passconfirm'])) {            
                         if(!filter_var($name, FILTER_SANITIZE_STRING)){
                             $_SESSION['checking'] = "wrongusername";
                             return header('Location: '. BASEURL . 'register/index/wrongusername');
                         }
+                        else if(!$nrpformat){
+                            $_SESSION['checking'] = "wrongnrp";
+                            return header('Location: '. BASEURL . 'register/index/wrongnrp');                
+                        }
                         else if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                             $_SESSION['checking'] = "wrongemail";
                             return header('Location: '. BASEURL . 'register/index/wrongemail');                
+                        }
+                        else if(!$numberphoneformat){
+                            $_SESSION['checking'] = "wrongphonenumber";
+                            return header('Location: '. BASEURL . 'register/index/wrongphonenumber');                
                         }
                         elseif(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_POST['password']) < 8){
                             $_SESSION['checking'] = "passnotstrength";

@@ -148,10 +148,10 @@ class Home extends Controller{
             $maxrent = $data['item']['item_maxrent'];
             if($this->model('TransaksiModel')->addData($_POST['userid'], $_POST['itemid'], $maxrent)){
                 $itemstock = $this->model('ItemsModel')->getStockById($_POST['itemid']);
-                if($itemstock == 1){
+                if($itemstock['item_stock'] == 1){
                     $newstock = $itemstock['item_stock']-1;
                     $this->model('ItemsModel')->updateStockbyId($_POST['itemid'], $newstock);
-                    $this->model('ItemsModel')->deleteOne($_POST['itemid']);
+                    // $this->model('ItemsModel')->deleteOne($_POST['itemid']);
                 }
                 else{
                     $newstock = $itemstock['item_stock']-1;
