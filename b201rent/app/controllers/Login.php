@@ -235,7 +235,8 @@ class Login extends Controller{
     public function sendmailfailed($user_email){
         session_start();
         if(isset($_SESSION['user_name']) && isset($_SESSION['role'])){            
-            session_destroy();
+            unset($_SESSION['user_name']);
+            unset($_SESSION['role']);
         }
         // if (empty($_SESSION['token'])) {
         $_SESSION['token'] = bin2hex(random_bytes(32));
@@ -287,6 +288,12 @@ class Login extends Controller{
                         $data['error'] = "Email Berhasil Dikirim, Silahkan Reset Password Anda Melalui Link yang Kami Kirimkan";    
                         unset($_SESSION['checking']);
                     }                                                            
+                    break;
+                case 'wrongemail':
+                    if($_SESSION['checking'] == "wrongemail"){
+                        $data['error'] = "Email Yang Anda Masukkan Tidak Sesuai Dengan Format Email Pada Umumnya";    
+                        unset($_SESSION['checking']);
+                    }                                                            
                     break;                
                 default:
                     $data['error'] = '';
@@ -302,7 +309,7 @@ class Login extends Controller{
 
     public function sendemailforgot(){
         session_start();
-        if(isset($_POST['email'])){
+        if(isset($_POST['email']) && filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
             if (!empty($_POST['csrf_token'])) {
                 if (hash_equals($_SESSION['token'], $_POST['csrf_token'])) {
                     if($this->model('UsersModel')->getbyUseremail($_POST['email'])){                        
@@ -371,8 +378,8 @@ class Login extends Controller{
             }                        
         }
         else{
-            http_response_code(401);
-            die();        
+            $_SESSION['checking'] = "wrongemail";
+            return header('Location: '. BASEURL . 'login/forgotpassword/wrongemail');        
         }        
     }
 
