@@ -56,6 +56,13 @@
         </a>        
       </li>
 
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="<?=BASEURL?>dashboard/showusers">
+            <i class="fas fa-user"></i>
+            <span>Table Users</span>
+        </a>        
+      </li>
+
     </ul>    
 
     <!-- Content Wrapper -->
@@ -297,48 +304,108 @@
         }              
       elseif(isset($data['history'])){
       ?>
-       <div class="row mt-5">      
+      <div class="container">
+        <div class="row mt-5">      
+              <div class="col-lg-12" style="overflow-x: auto;">
+                <table class="table">                
+                  <thead class="thead-dark">
+                    <tr>                    
+                      <th scope="col" class="text-center">item_id</th>
+                      <th scope="col" class="text-center">user_name</th>
+                      <th scope="col" class="text-center">item_name</th>
+                      <th scope="col" class="text-center">item_category</th>
+                      <th scope="col" class="text-center">transaksi_start</th>
+                      <th scope="col" class="text-center">transaksi_end</th>
+                      <th scope="col" class="text-center">transaksi_status</th>                    
+                      <th scope="col" class="text-center">action</th>
+                    </tr>
+                  </thead>                
+                  <tbody>
+                    <?php
+                    foreach($data['history'] as $history){                  
+                    ?>                  
+                    <tr>                                        
+                      <td class="text-center align-middle"><?=$history['item_id']?></td>
+                      <td class="text-center align-middle"><?=$history['user_name']?></td>
+                      <td class="text-center align-middle"><?=$history['item_name']?></td>
+                      <td class="text-center align-middle"><?=$history['item_category']?></td>
+                      <td class="text-center align-middle"><?=$history['transaksi_start']?></td>
+                      <td class="text-center align-middle"><?=$history['transaksi_end']?></td>
+                      <td class="text-center align-middle"><?=$history['transaksi_status']?></td>                    
+                      <td class="text-center align-middle">                      
+                          <?php
+                          if($history['transaksi_status'] == "waiting"){
+                          ?>
+                          <form action="<?=BASEURL?>dashboard/verifrent" method="post">
+                          <input type="hidden" name="transaksiid" value="<?=$history['transaksi_id']?>">                        
+                          <button type="submit" class="btn btn-success">Verif Rent</button>
+                          </form>
+                          <?php
+                          }
+                          elseif($history['transaksi_status'] == "rent"){                        
+                          ?>
+                          <form action="<?=BASEURL?>/dashboard/verifdone" method="post">
+                          <input type="hidden" name="transaksiid" value="<?=$history['transaksi_id']?>">                        
+                          <button type="submit" class="btn btn-danger">Verif Done</button>
+                          </form>
+                          <?php
+                          }
+                          ?>                      
+                      </td>                    
+                    </tr>
+                    <?php
+                    }
+                    ?>                                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>         
+      <?php 
+      }
+      else if(isset($data['users'])){      
+      ?>
+      <div class="container">
+      <div class="row mt-5">      
             <div class="col-lg-12" style="overflow-x: auto;">
               <table class="table">                
                 <thead class="thead-dark">
                   <tr>                    
-                    <th scope="col" class="text-center">item_id</th>
+                    <th scope="col" class="text-center">user_id</th>
                     <th scope="col" class="text-center">user_name</th>
-                    <th scope="col" class="text-center">item_name</th>
-                    <th scope="col" class="text-center">item_category</th>
-                    <th scope="col" class="text-center">transaksi_start</th>
-                    <th scope="col" class="text-center">transaksi_end</th>
-                    <th scope="col" class="text-center">transaksi_status</th>                    
+                    <th scope="col" class="text-center">user_email</th>
+                    <th scope="col" class="text-center">user_nrp</th>
+                    <th scope="col" class="text-center">user_phone</th>
+                    <th scope="col" class="text-center">is_admin</th>                    
                     <th scope="col" class="text-center">action</th>
                   </tr>
                 </thead>                
                 <tbody>
                   <?php
-                  foreach($data['history'] as $history){                  
+                  foreach($data['users'] as $user){                  
                   ?>                  
                   <tr>                                        
-                    <td class="text-center align-middle"><?=$history['item_id']?></td>
-                    <td class="text-center align-middle"><?=$history['user_name']?></td>
-                    <td class="text-center align-middle"><?=$history['item_name']?></td>
-                    <td class="text-center align-middle"><?=$history['item_category']?></td>
-                    <td class="text-center align-middle"><?=$history['transaksi_start']?></td>
-                    <td class="text-center align-middle"><?=$history['transaksi_end']?></td>
-                    <td class="text-center align-middle"><?=$history['transaksi_status']?></td>                    
+                    <td class="text-center align-middle"><?=$user['userId']?></td>
+                    <td class="text-center align-middle"><?=$user['user_name']?></td>
+                    <td class="text-center align-middle"><?=$user['user_email']?></td>
+                    <td class="text-center align-middle"><?=$user['user_nrp']?></td>
+                    <td class="text-center align-middle"><?=$user['user_phone']?></td>
+                    <td class="text-center align-middle"><?=$user['is_admin']?></td>                    
                     <td class="text-center align-middle">                      
                         <?php
-                        if($history['transaksi_status'] == "waiting"){
+                        if($user['is_admin'] == NULL){
                         ?>
-                        <form action="<?=BASEURL?>dashboard/verifrent" method="post">
-                        <input type="hidden" name="transaksiid" value="<?=$history['transaksi_id']?>">                        
-                        <button type="submit" class="btn btn-success">Verif Rent</button>
+                        <form action="<?=BASEURL?>dashboard/changetoadmin" method="post">
+                        <input type="hidden" name="userid" value="<?=$user['userId']?>">                        
+                        <button type="submit" class="btn btn-success">Change to Admin</button>
                         </form>
                         <?php
                         }
-                        elseif($history['transaksi_status'] == "rent"){                        
+                        elseif($user['is_admin']){                        
                         ?>
-                        <form action="<?=BASEURL?>/dashboard/verifdone" method="post">
-                        <input type="hidden" name="transaksiid" value="<?=$history['transaksi_id']?>">                        
-                        <button type="submit" class="btn btn-danger">Verif Done</button>
+                        <form action="<?=BASEURL?>dashboard/changetouser" method="post">
+                        <input type="hidden" name="userid" value="<?=$user['userId']?>">                        
+                        <button type="submit" class="btn btn-danger">Change to User</button>
                         </form>
                         <?php
                         }
@@ -351,8 +418,9 @@
                 </tbody>
               </table>
             </div>
-          </div>         
-      <?php 
+          </div>
+        </div>       
+      <?php
       }
       ?>
         

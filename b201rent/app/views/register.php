@@ -36,6 +36,7 @@
                   placeholder="NRP"
                   autocomplete="off"
                   required
+                  onkeypress="return isNumberKey(event)"
                 />
               </div>
               <div class="form-group">
@@ -62,6 +63,7 @@
                   minlength="11"
                   maxlength="12"
                   required
+                  onkeypress="return isNumberKey(event)"
                 />
               </div>            
               <div class="form-group">

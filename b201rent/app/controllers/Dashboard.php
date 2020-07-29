@@ -48,6 +48,11 @@ class Dashboard extends Controller{
         return $this->view('dashboard', $data);
     }
 
+    public function showUsers(){
+        $data['users'] = $this->model('UsersModel')->getAll();
+        return $this->view('dashboard', $data);
+    }
+
     public function additem(){
         if($this->uploadimage($_FILES['itemimage'], $_POST['itemcategory'])){
             $imagename = $this->uploadimage($_FILES['itemimage'], $_POST['itemcategory']);
@@ -175,6 +180,22 @@ class Dashboard extends Controller{
             echo "Anda Tidak Seharusnya Disini";
         }
 
+    }
+
+    public function changetoadmin(){
+        if(isset($_POST['userid']) && $_SESSION['role'] == "admin"){
+            if($this->model('UsersModel')->updatetoAdmin($_POST['userid'])){
+                return header("Location: " . BASEURL . "dashboard/showusers");
+            }            
+        }
+    }
+
+    public function changetouser(){        
+        if(isset($_POST['userid']) && $_SESSION['role'] == "admin"){        
+            if($this->model('UsersModel')->updatetoUser($_POST['userid'])){
+                return header("Location: " . BASEURL . "dashboard/showusers");
+            }            
+        }
     }
 }
 ?>

@@ -78,6 +78,22 @@
          $this->db->query($query);
          $this->db->bind('userid', $userid);
          return $this->db->resultSingle();
-      }      
+      }
+
+      public function updatetoAdmin($userid){         
+         $query = "UPDATE " . $this->table . " SET is_admin = 1 WHERE userId = :userid";
+         $this->db->query($query);
+         $this->db->bind('userid', $userid);         
+         $this->db->execute();
+         return $this->db->rowCount();
+      }
+
+      public function updatetoUser($userid){         
+         $query = "UPDATE " . $this->table . " SET is_admin = NULL WHERE userId = :userid";
+         $this->db->query($query);
+         $this->db->bind('userid', $userid);         
+         $this->db->execute();
+         return $this->db->rowCount();
+      }
  }
 ?>

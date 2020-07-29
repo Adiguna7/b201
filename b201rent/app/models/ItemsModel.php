@@ -47,11 +47,11 @@
             return $this->db->resultSet();
         }
 
-        public function getFromCategoryLimit($category, $limit){
-            $query = "SELECT * FROM " . $this->table . " WHERE item_category = :category ORDER BY RAND() LIMIT :limit";
+        public function getFromCategoryLimit($category, $itemid){
+            $query = "SELECT * FROM " . $this->table . " WHERE item_category = :category AND item_id <> :itemid ORDER BY RAND() LIMIT 4";
             $this->db->query($query);
             $this->db->bind("category", $category);
-            $this->db->bind("limit", $limit);
+            $this->db->bind("itemid", $itemid);
             return $this->db->resultSet();
         }
         

@@ -98,7 +98,7 @@ class Home extends Controller{
         else{
             $data['itemsingle'] = $this->model('ItemsModel')->getById($id);
             $dataitemcategory = $data['itemsingle']['item_category'];
-            $data['relateditems'] = $this->model('ItemsModel')->getFromCategoryLimit($dataitemcategory, 4);
+            $data['relateditems'] = $this->model('ItemsModel')->getFromCategoryLimit($dataitemcategory, $id);
             // var_dump($data['relateditem']);
             if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
                 $data['role'] = $_SESSION['role'];
