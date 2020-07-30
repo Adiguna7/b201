@@ -182,7 +182,7 @@ class Login extends Controller{
                                     date_default_timezone_set("Asia/Jakarta");
                                     $timenow = date("Y-m-d H:i:s");          
                                     if($this->model('FailedModel')->getCheckOneUser($data_user['userId'], $timenow)){
-                                        $data['error'] = "Akun Anda Sedang Dalam Lock Account, Tidak Bisa Diakses Dalam 30 Menit. Konfirmasi Email Untuk Menghapusnya.";
+                                        $data['error'] = "Akun Anda Sedang Dalam Lock Account, Tidak Bisa Diakses Dalam 30 Menit.";
                                     }
                                     else{
                                         $time = strtotime(date('Y-m-d H:i:s'));

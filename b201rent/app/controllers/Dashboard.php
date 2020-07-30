@@ -38,6 +38,15 @@ class Dashboard extends Controller{
             }            
         }
         $data['items'] = $this->model('ItemsModel')->getAll();
+        $itemsrent = $this->model('ItemsModel')->checkItemsRent();                
+        // var_dump($data['items_rent']);
+        $data['items_rent'] = [];         
+
+        foreach($itemsrent as $datarent){               
+            array_push($data['items_rent'], $datarent['item_id']);
+        }
+        
+        // var_dump($data['items_rent']);
         unset($_SESSION['checking_admin']);
         return $this->view('dashboard', $data);
                             

@@ -29,7 +29,7 @@
     <!-- Sidebar -->
     <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #760933;">
       
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?=BASEURL?>dashboard/showitem">
         <div class="sidebar-brand-icon">
           <i class="fas fa-fw fa-tachometer-alt"></i>
         </div>
@@ -286,7 +286,9 @@
                           <form action="<?=BASEURL?>dashboard/deleteitem" method="POST">
                             <input type="hidden" name="itemid" value="<?=$item['item_id']?>">
                             <input type="hidden" name="itemimage" value="<?=$item['item_image']?>">
-                            <button type="submit" class="btn btn-success w-100" style="padding: 5px 3px;">Delete</button>
+                              <button type="submit" class="btn btn-success w-100" style="padding: 5px 3px;"
+                              <?php if(in_array($item['item_id'], $data['items_rent'])){echo "disabled";}?>                              
+                              >Delete</button>
                           </form>
                         </div>
                       </div>                                            

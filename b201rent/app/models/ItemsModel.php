@@ -120,5 +120,11 @@
             return $this->db->rowCount();
         }
 
+        public function checkItemsRent(){
+            $query = "SELECT i.item_id FROM transaksi t, items i WHERE i.item_id = t.item_id AND t.transaksi_status <> 'done'";
+            $this->db->query($query);
+            return $this->db->resultSet();    
+        }
+
     }
 ?>
