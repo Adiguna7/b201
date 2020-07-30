@@ -144,7 +144,7 @@
                             <input name="itemdescription" type="text" class="form-control" id="itemdescriptionid" placeholder="item_description" required>
                           </div>
                           <div class="form-group">                            
-                            <input name="itemimage" type="file" class="form-control-file" id="itemimageid" placeholder="item_image" required>
+                            <input type="file" name="itemimage" class="form-control-file" id="itemimageid" accept=".png, .jpg, .jpeg" required />
                           </div>
                           <div class="form-group">
                             <select class="form-control" id="itemcategoryid" name="itemcategory" aria-placeholder="item_category" required>
@@ -156,13 +156,13 @@
                             </select>
                           </div>
                           <div class="form-group">                            
-                            <input name="itemstock" type="number" min="1" max="10" class="form-control" id="itemstockid" placeholder="item_stock" required>
+                            <input name="itemstock" type="number" min="1" max="10" class="form-control" id="itemstockid" placeholder="item_stock" required onkeypress="return isNumberKey(event)">
                           </div>
                           <div class="form-group">                            
-                            <input name="itemmaxrent" type="number" min="1" max="14" class="form-control" id="itemmaxrentid" placeholder="item_maxrent" required>
+                            <input name="itemmaxrent" type="number" min="1" max="14" class="form-control" id="itemmaxrentid" placeholder="item_maxrent" required onkeypress="return isNumberKey(event)">
                           </div>
                           <div class="form-group">                            
-                            <input name="itemcharge" type="number" min="1000" max="10000" step="500" class="form-control" id="itemchargeid" placeholder="item_charge" required>
+                            <input name="itemcharge" type="number" min="1000" max="10000" step="500" class="form-control" id="itemchargeid" placeholder="item_charge" required onkeypress="return isNumberKey(event)">
                           </div>
                       </div>
                       <div class="modal-footer">                        
@@ -204,7 +204,7 @@
                     <td class="text-center align-middle"><?= $item['item_description'] ?></td>
                     <td class="text-center align-middle"><?= $item['item_category'] ?></td>
                     <td class="text-center align-middle"><!-- Button trigger modal -->
-                      <button type="button" class="btn p-0" data-toggle="modal" data-target="#imagemodal<?=$item['item_id']?>">
+                      <button type="button" class="btn p-0 text-primary" data-toggle="modal" data-target="#imagemodal<?=$item['item_id']?>">
                       <?= $item['item_image'] ?>
                       </button>
                       <!-- Modal IMAGE-->
@@ -250,7 +250,7 @@
                                         <input name="itemdescription" type="text" class="form-control" id="itemdescriptionid" placeholder="item_description" value="<?=$item['item_description']?>" required>
                                       </div>
                                       <div class="form-group">                            
-                                        <input name="itemimage" type="file" class="form-control-file" id="itemimageid" placeholder="item_image">
+                                        <input type="file" name="itemimage" class="form-control-file" id="itemimageid" accept=".png, .jpg, .jpeg">
                                       </div>
                                       <div class="form-group">
                                         <select class="form-control" id="itemcategoryid" name="itemcategory" aria-placeholder="item_category" required>                                          
@@ -262,13 +262,13 @@
                                         </select>
                                       </div>
                                       <div class="form-group">                            
-                                        <input name="itemstock" type="number" min="1" max="10" class="form-control" id="itemstockid" placeholder="item_stock" value="<?=$item['item_stock']?>" required>
+                                        <input name="itemstock" type="number" min="1" max="10" class="form-control" id="itemstockid" placeholder="item_stock" value="<?=$item['item_stock']?>" required onkeypress="return isNumberKey(event)">
                                       </div>
                                       <div class="form-group">                            
-                                        <input name="itemmaxrent" type="number" min="1" max="14" class="form-control" id="itemmaxrentid" placeholder="item_maxrent" value="<?=$item['item_maxrent']?>" required>
+                                        <input name="itemmaxrent" type="number" min="1" max="14" class="form-control" id="itemmaxrentid" placeholder="item_maxrent" value="<?=$item['item_maxrent']?>" required onkeypress="return isNumberKey(event)">
                                       </div>
                                       <div class="form-group">                            
-                                        <input name="itemcharge" type="number" min="1000" max="10000" step="500" class="form-control" id="itemchargeid" placeholder="item_charge" value="<?=$item['item_charge']?>" required>
+                                        <input name="itemcharge" type="number" min="1000" max="10000" step="500" class="form-control" id="itemchargeid" placeholder="item_charge" value="<?=$item['item_charge']?>" required onkeypress="return isNumberKey(event)">
                                       </div>
                                   </div>
                                   <div class="modal-footer">
@@ -444,7 +444,8 @@
   <script src="<?=BASEURL?>js/jquery-3.4.1.min.js"></script>
   <script src="<?=BASEURL?>js/bootstrap.min.js"></script>
   <script src="<?=BASEURL?>js/all.min.js"></script>
-  <script src="<?=BASEURL?>js/sb-admin-2.min.js"></script>  
+  <script src="<?=BASEURL?>js/sb-admin-2.min.js"></script>
+  <script src="<?=BASEURL?>js/restrict.js"></script>  
 </body>
 
 </html>

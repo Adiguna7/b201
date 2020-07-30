@@ -90,33 +90,33 @@ class Home extends Controller{
     }
 
     public function itemdetail($id = null){
-        // $data = "";        
-        if($id == null || $this->model('ItemsModel')->getById($id) == NULL){
-            header("Location: " . BASEURL . "home/category");
-            exit();
+        // $data = "";                
+        if($id != NULL){
+            if($this->model('ItemsModel')->getById($id)){                     
+                $data['itemsingle'] = $this->model('ItemsModel')->getById($id);
+                $dataitemcategory = $data['itemsingle']['item_category'];
+                $data['relateditems'] = $this->model('ItemsModel')->getFromCategoryLimit($dataitemcategory, $id);
+                // var_dump($data['relateditem']);
+                if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
+                    $data['role'] = $_SESSION['role'];
+                    $data['user_name'] = $_SESSION['user_name'];
+                }
+                $data['title'] = "Itemdetail";            
+                $this->view('user/homehead', $data);
+                $this->view('itemdetail', $data);
+                return $this->view('user/hometail');
+            }
+            else{
+                return header("Location: " . BASEURL . "home/category");    
+            }
         }
         else{
-            $data['itemsingle'] = $this->model('ItemsModel')->getById($id);
-            $dataitemcategory = $data['itemsingle']['item_category'];
-            $data['relateditems'] = $this->model('ItemsModel')->getFromCategoryLimit($dataitemcategory, $id);
-            // var_dump($data['relateditem']);
-            if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
-                $data['role'] = $_SESSION['role'];
-                $data['user_name'] = $_SESSION['user_name'];
-            }
-            $data['title'] = "Itemdetail";            
-            $this->view('user/homehead', $data);
-            $this->view('itemdetail', $data);
-            return $this->view('user/hometail');
+            return header("Location: " . BASEURL . "home/category");
         }        
     }
 
     public function cart($itemid = null){                
-        if($itemid == null){
-            header("Location: " . BASEURL . "home/category");
-            exit();
-        }
-        else{            
+        if($itemid != null){
             if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
                 $data['role'] = $_SESSION['role'];
                 $data['user_name'] = $_SESSION['user_name'];
@@ -138,7 +138,10 @@ class Home extends Controller{
             else{
                 header("Location: " . BASEURL . "home/category");
                 exit();                        
-            }
+            }            
+        }
+        else{
+            return header("Location: " . BASEURL . "home/category");            
         }
     }
 

@@ -54,19 +54,29 @@ class Dashboard extends Controller{
     }
 
     public function additem(){
-        if($this->uploadimage($_FILES['itemimage'], $_POST['itemcategory'])){
-            $imagename = $this->uploadimage($_FILES['itemimage'], $_POST['itemcategory']);
-            if($this->model('ItemsModel')->addOne($_POST, $imagename)){
-                session_start();
-                $_SESSION['checking_admin'] = "addsuccess";
-                header("Location: " . BASEURL . "dashboard/showitem/addsuccess");
+        if(isset($_FILES['itemimage']['name'])){
+            if(getimagesize($_FILES['itemimage']['tmp_name'])){        
+                if($this->uploadimage($_FILES['itemimage'], $_POST['itemcategory'])){
+                    $imagename = $this->uploadimage($_FILES['itemimage'], $_POST['itemcategory']);
+                    if($this->model('ItemsModel')->addOne($_POST, $imagename)){
+                        session_start();
+                        $_SESSION['checking_admin'] = "addsuccess";
+                        return header("Location: " . BASEURL . "dashboard/showitem/addsuccess");
+                    }
+                    else{
+                        echo "gagal insert";
+                    }
+                }
+                else{
+                    echo "error upload";
+                }
             }
             else{
-                echo "gagal insert";
+                echo "File yang Anda Masukkan Bukan Jenis Image";
             }
         }
         else{
-            echo "error upload";
+            echo "Tidak Ada Gambar Yang Dimasukkan";
         }
     }
 
@@ -81,35 +91,40 @@ class Dashboard extends Controller{
             }        
         }
         else{
-            echo "tidak ada yang dihapus";
+            echo "Gagal Hapus";
         }
     }
 
     public function updateitem(){
         if(isset($_FILES['itemimage']['name']) && $_FILES['itemimage']['name'] != NULL){
-            echo ($_FILES['itemimage']);
-            $targetdir = $_SERVER['DOCUMENT_ROOT'] . "/img/items/";
-            $itemimage = $_FILES['itemimage'];
-            $file_ext=strtolower(end(explode('.',$itemimage['name'])));
-            $extensions= array("jpeg","jpg","png");
-            if(in_array($file_ext, $extensions) && $itemimage['size'] < "200000"){
-                $newfilename = $_POST['itemimagename'];
-                if(unlink($targetdir . $newfilename)){
-                    move_uploaded_file($itemimage["tmp_name"], $targetdir . $newfilename);
-                    echo "pass2";                    
+            // var_dump ($_FILES['itemimage']);
+            if(getimagesize($_FILES['itemimage']['tmp_name'])){        
+                // echo ($_FILES['itemimage']);
+                $targetdir = $_SERVER['DOCUMENT_ROOT'] . "/img/items/";
+                $itemimage = $_FILES['itemimage'];
+                $file_ext=strtolower(end(explode('.',$itemimage['name'])));
+                $extensions= array("jpeg","jpg","png");
+                if(in_array($file_ext, $extensions) && $itemimage['size'] < "200000"){
+                    $newfilename = $_POST['itemimagename'];
+                    if(unlink($targetdir . $newfilename)){
+                        move_uploaded_file($itemimage["tmp_name"], $targetdir . $newfilename);
+                        // echo "pass2";                    
+                    }
+                    // var_dump($newfilename);                            
+                    // echo "pass";                
                 }
-                // var_dump($newfilename);                            
-                echo "pass";                
+                else{
+                    echo "gagal update upload";
+                }
             }
             else{
-                echo "gagal update upload";
+                echo "File yang Anda Masukkan Bukan Jenis Image";
             }
-        }
-        if($this->model('ItemsModel')->updateOne($_POST)){
-            $_SESSION['checking_admin'] = "updatesuccess";
-            header("Location: " . BASEURL . "dashboard/showitem/updatesuccess");
-            // echo "update sukses";
-        }
+        }        
+        $this->model('ItemsModel')->updateOne($_POST);
+        $_SESSION['checking_admin'] = "updatesuccess";
+        return header("Location: " . BASEURL . "dashboard/showitem/updatesuccess");
+        // echo "update sukses";        
     }
 
     public function deletesuccess(){

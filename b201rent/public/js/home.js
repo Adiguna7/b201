@@ -23,7 +23,7 @@ function getdataitem(e){
 }
 
 function setdataitem(dataitem){
-    console.log("pass");            
+    // console.log("pass");            
     var html = '';
     for (var i = 0; i < dataitem.length; i++) {        
         var css = "'http://localhost:90/img/items/" + dataitem[i].item_image + "'";
