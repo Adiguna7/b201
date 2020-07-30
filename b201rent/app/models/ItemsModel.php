@@ -42,8 +42,9 @@
         }
 
         public function getFromCategory($category){
-            $query = "SELECT * FROM " . $this->table . " WHERE item_category = '$category'";
+            $query = "SELECT * FROM " . $this->table . " WHERE item_category = :category";            
             $this->db->query($query);
+            $this->db->bind("category", $category);
             return $this->db->resultSet();
         }
 

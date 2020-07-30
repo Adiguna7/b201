@@ -5,8 +5,8 @@ class Dashboard extends Controller{
     {
         ini_set( 'session.cookie_httponly', 1 );
         session_start();
-        if($_SESSION['role'] == NULL){
-            header('Location: '.BASEURL.'login');
+        if($_SESSION['role'] !== "admin"){
+            header('Location: '.BASEURL.'home');
         }
     }
 
@@ -23,43 +23,60 @@ class Dashboard extends Controller{
         }                
     }
     
-    public function showitem($paramsuccess = NULL){
+    public function showitem($paramsuccess = NULL){        
         session_start();
-        $data = [];
-        if(isset($paramsuccess) && $paramsuccess != NULL){
-            if($paramsuccess == "deletesuccess" && $_SESSION['checking_admin'] == "deletesuccess"){            
-                $data['success'] = "Berhasil Delete Data";                                        
-            }
-            elseif($paramsuccess == "updatesuccess" && $_SESSION['checking_admin'] == "updatesuccess"){
-                $data['success'] = "Berhasil Update Data";                                 
-            }
-            elseif($paramsuccess == "addsuccess" && $_SESSION['checking_admin'] == "addsuccess"){
-                $data['success'] = "Berhasil Tambah Data";                                 
-            }            
+        if($_SESSION['role'] !== "admin"){
+            return header('Location: '.BASEURL.'home');
         }
-        $data['items'] = $this->model('ItemsModel')->getAll();
-        $itemsrent = $this->model('ItemsModel')->checkItemsRent();                
-        // var_dump($data['items_rent']);
-        $data['items_rent'] = [];         
+        else{
+            $data = [];
+            if(isset($paramsuccess) && $paramsuccess != NULL){
+                if($paramsuccess == "deletesuccess" && $_SESSION['checking_admin'] == "deletesuccess"){            
+                    $data['success'] = "Berhasil Delete Data";                                        
+                }
+                elseif($paramsuccess == "updatesuccess" && $_SESSION['checking_admin'] == "updatesuccess"){
+                    $data['success'] = "Berhasil Update Data";                                 
+                }
+                elseif($paramsuccess == "addsuccess" && $_SESSION['checking_admin'] == "addsuccess"){
+                    $data['success'] = "Berhasil Tambah Data";                                 
+                }            
+            }
+            $data['items'] = $this->model('ItemsModel')->getAll();
+            $itemsrent = $this->model('ItemsModel')->checkItemsRent();                
+            // var_dump($data['items_rent']);
+            $data['items_rent'] = [];         
 
-        foreach($itemsrent as $datarent){               
-            array_push($data['items_rent'], $datarent['item_id']);
+            foreach($itemsrent as $datarent){               
+                array_push($data['items_rent'], $datarent['item_id']);
+            }
+            
+            // var_dump($data['items_rent']);
+            unset($_SESSION['checking_admin']);
+            return $this->view('dashboard', $data);
         }
-        
-        // var_dump($data['items_rent']);
-        unset($_SESSION['checking_admin']);
-        return $this->view('dashboard', $data);
                             
     }
 
     public function showHistory(){
-        $data['history'] = $this->model('TransaksiModel')->getAllHistory();
-        return $this->view('dashboard', $data);
+        session_start();
+        if($_SESSION['role'] !== "admin"){
+            return header('Location: '.BASEURL.'home');
+        }
+        else{
+            $data['history'] = $this->model('TransaksiModel')->getAllHistory();
+            return $this->view('dashboard', $data);
+        }        
     }
 
     public function showUsers(){
-        $data['users'] = $this->model('UsersModel')->getAll();
-        return $this->view('dashboard', $data);
+        session_start();
+        if($_SESSION['role'] !== "admin"){
+            return header('Location: '.BASEURL.'home');
+        }
+        else{
+            $data['users'] = $this->model('UsersModel')->getAll();
+            return $this->view('dashboard', $data);
+        }        
     }
 
     public function additem(){
@@ -136,28 +153,30 @@ class Dashboard extends Controller{
         // echo "update sukses";        
     }
 
-    public function deletesuccess(){
-        $data['success'] = "Berhasil Delete Data";
-        return $this->view('dashboard', $data);
-    }
+    // public function deletesuccess(){
+    //     $data['success'] = "Berhasil Delete Data";
+    //     return $this->view('dashboard', $data);
+    // }
 
     public function uploadimage($imageupload, $itemcategory){
-        $targetdir = $_SERVER['DOCUMENT_ROOT'] . "/img/items/";
-        $itemimage = $imageupload;
-        $endid = $this->model("ItemsModel")->getEndId();
-        $idfile = ((int)$endid['item_id']) + 1;
-        $file_ext=strtolower(end(explode('.',$itemimage['name'])));
-        $extensions= array("jpeg","jpg","png");
-        $itemtempname = $_SERVER['DOCUMENT_ROOT'] . "/php" . $itemimage['tmp_name'];
+        if($_SESSION['role'] == "admin" && isset($imageupload) && isset($itemcategory)){                    
+            $targetdir = $_SERVER['DOCUMENT_ROOT'] . "/img/items/";
+            $itemimage = $imageupload;
+            $endid = $this->model("ItemsModel")->getEndId();
+            $idfile = ((int)$endid['item_id']) + 1;
+            $file_ext=strtolower(end(explode('.',$itemimage['name'])));
+            $extensions= array("jpeg","jpg","png");
+            $itemtempname = $_SERVER['DOCUMENT_ROOT'] . "/php" . $itemimage['tmp_name'];
 
-        if(in_array($file_ext, $extensions) && $itemimage['size'] < "200000"){
-            $newfilename = $itemcategory . $idfile . '.' . $file_ext;
-            move_uploaded_file($itemimage["tmp_name"], $targetdir . $newfilename);
-            return $newfilename;
-        }
-        else{   
-            // echo $itemimage["tmp_name"];         
-            return NULL;
+            if(in_array($file_ext, $extensions) && $itemimage['size'] < "200000"){
+                $newfilename = $itemcategory . $idfile . '.' . $file_ext;
+                move_uploaded_file($itemimage["tmp_name"], $targetdir . $newfilename);
+                return $newfilename;
+            }
+            else{   
+                // echo $itemimage["tmp_name"];         
+                return NULL;
+            }
         }
 
     }

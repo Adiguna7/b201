@@ -70,19 +70,24 @@ class Home extends Controller{
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
         }
-        if($category == null){
+        if($category != NULL){
+            if($this->model('ItemsModel')->getFromCategory($category)){            
+                $data['title'] = "Category";
+                $data['judul'] = $category;
+                $data['items'] = $this->model('ItemsModel')->getFromCategory($category);            
+                $this->view('user/homehead', $data);        
+                $this->view('category', $data);
+                return $this->view('user/hometail');            
+            }
+            else{
+                return header("Location: " . BASEURL . "home");    
+            }
+        }
+        else{                    
             $data['judul'] = "All Category";
             $data['items'] = $this->model('ItemsModel')->getAll();
             // var_dump($data['jumlah']);
             $data['title'] = "Category";
-            $this->view('user/homehead', $data);        
-            $this->view('category', $data);
-            return $this->view('user/hometail');
-        }
-        else{        
-            $data['title'] = "Category";
-            $data['judul'] = $category;
-            $data['items'] = $this->model('ItemsModel')->getFromCategory($category);            
             $this->view('user/homehead', $data);        
             $this->view('category', $data);
             return $this->view('user/hometail');
@@ -187,15 +192,25 @@ class Home extends Controller{
             // var_dump($data['endcharge']);
             $data['latecharge'] = '';
             if($data['endcharge']){
-                if($datenowtime > $dateendtime){                                
-                    $different_time = ($datenowtime - $dateendtime)/60/60/24;
-                    // var_dump($different_time);
-                    $charge = $different_time * $data['endcharge']['item_charge'];
-                    $itemlatename = $data['endcharge']['item_name'];
-                    // var_dump($data['endcharge']['item_charge']);                                        
-                    if($itemlatename != NULL && $charge != NULL){                    
-                        $data['latecharge'] = "Anda Sudah Melampaui Batas Peminjaman Dengan Nama '". $itemlatename ."' Denda Anda Sebesar " . $charge . " Rupiah.";
+                if($datenowtime > $dateendtime){
+                    if($data['endcharge']['transaksi_status'] === "waiting"){
+                        if($this->model('TransaksiModel')->updateStatus($data['endcharge']['transaksi_id'], "done")){                
+                            $datatransaksi = $this->model('TransaksiModel')->getbyId($data['endcharge']['transaksi_id']); 
+                            $dataitems = $this->model('ItemsModel')->getStockById($data['endcharge']['item_id']);
+                            $newstock = $dataitems['item_stock']+1;
+                            $this->model('ItemsModel')->updateStockbyId($datatransaksi['item_id'], $newstock);                            
+                        }
                     }
+                    else if($data['endcharge']['transaksi_status'] === "rent"){
+                        $different_time = ($datenowtime - $dateendtime)/60/60/24;
+                        // var_dump($different_time);
+                        $charge = $different_time * $data['endcharge']['item_charge'];
+                        $itemlatename = $data['endcharge']['item_name'];
+                        // var_dump($data['endcharge']['item_charge']);                                        
+                        if($itemlatename != NULL && $charge != NULL){                    
+                            $data['latecharge'] = "Anda Sudah Melampaui Batas Peminjaman Dengan Nama '". $itemlatename ."' Denda Anda Sebesar " . $charge . " Rupiah.";
+                        }
+                    }                                                    
                 }
             }                                
             // var_dump($data['history']);            
