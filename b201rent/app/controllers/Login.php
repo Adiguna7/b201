@@ -80,6 +80,18 @@ class Login extends Controller{
                         $data['error'] = "Akun Anda Sedang Dalam Lock Account, Tidak Bisa Diakses Dalam 30 Menit. Konfirmasi Email Untuk Menghapusnya.";
                         unset($_SESSION['checking']);
                     }
+                    break;                                
+                case 'wrongusername':
+                    if($_SESSION['checking'] == "wrongusername"){
+                        $data['error'] = "Username Hanya Boleh Terdiri Dari Huruf Kecil";
+                        unset($_SESSION['checking']);
+                    }
+                    break;
+                case 'passnotstrength':
+                    if($_SESSION['checking'] == "passnotstrength"){
+                        $data['error'] = "Password Pattern Salah";
+                        unset($_SESSION['checking']);
+                    }
                     break;                                                                        
                 default:                                
                     $data['error'] = '';
@@ -128,8 +140,21 @@ class Login extends Controller{
                 if (hash_equals($_SESSION['token'], $_POST['csrf_token'])) {
                     htmlspecialchars($_POST['name']);                 
                     $name = $_POST['name'];
-                    $password = $_POST['password'];                
-                    if($this->model('UsersModel')->getbyUsername($name)){
+                    $password = $_POST['password'];
+                    $uppercase = preg_match('@[A-Z]@', $_POST['password']);
+                    $lowercase = preg_match('@[a-z]@', $_POST['password']);                    
+                    $lowercasename = preg_match('@^[a-z\s]+$@', $_POST['name']);
+                    $number    = preg_match('@[0-9]@', $_POST['password']);
+                    $specialChars = preg_match('@[^\w]@', $_POST['password']);
+                    if(!$lowercasename){
+                        $_SESSION['checking'] = "wrongusername";
+                        return header('Location: '. BASEURL . 'login/index/wrongusername');
+                    }
+                    elseif(!$uppercase || !$lowercase || !$number || !$specialChars || strlen($_POST['password']) < 8){
+                        $_SESSION['checking'] = "passnotstrength";
+                        return header('Location: '. BASEURL . 'login/index/passnotstrength');
+                    }       
+                    elseif($this->model('UsersModel')->getbyUsername($name)){
                         $data_user = $this->model('UsersModel')->getbyUsername($name);             
                         if(password_verify($password, $data_user['user_password'])){
                             if(!$data_user['is_verify']){

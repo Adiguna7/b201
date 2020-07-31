@@ -78,7 +78,7 @@ class Register extends Controller{
                     break;
                 case 'wrongusername':
                     if($_SESSION['checking'] == "wrongusername"){
-                        $data['error'] = "Username Hanya Boleh Terdiri Dari Huruf";
+                        $data['error'] = "Username Hanya Boleh Terdiri Dari Huruf Kecil";
                         unset($_SESSION['checking']);
                     }
                     break;
@@ -122,23 +122,18 @@ class Register extends Controller{
         // var_dump($_SESSION['token']);        
         if (!empty($_POST['csrf_token'])) {
             if(Captcha::check()){
-                if (hash_equals($_SESSION['token'], $_POST['csrf_token'])) {
-                    htmlspecialchars($_POST['name']);
-                    htmlspecialchars($_POST['email']);
-                    htmlspecialchars($_POST['nrp']);
-                    htmlspecialchars($_POST['phone']);
-                    $name = trim($_POST['name']);         
-                    $name = stripslashes($name);
+                if (hash_equals($_SESSION['token'], $_POST['csrf_token'])) {                                        
                     $email = trim($_POST['email']);       
                     $email = stripslashes($email);
                     $uppercase = preg_match('@[A-Z]@', $_POST['password']);
-                    $lowercase = preg_match('@[a-z]@', $_POST['password']);
+                    $lowercase = preg_match('@[a-z]@', $_POST['password']);                    
+                    $lowercasename = preg_match('@^[a-z\s]+$@', $_POST['name']);
                     $number    = preg_match('@[0-9]@', $_POST['password']);
                     $specialChars = preg_match('@[^\w]@', $_POST['password']);
                     $nrpformat = preg_match('@^([0-9]{14})$@', $_POST['nrp']);
                     $numberphoneformat = preg_match('@^(08)([0-9]{9,11})$@', $_POST['phone']); 
                     if (isset($_POST['password']) && isset($_POST['name']) && isset($_POST['nrp']) && isset($_POST['email']) && isset($_POST['phone']) && isset($_POST['passconfirm'])) {            
-                        if(!filter_var($name, FILTER_SANITIZE_STRING)){
+                        if(!$lowercasename){
                             $_SESSION['checking'] = "wrongusername";
                             return header('Location: '. BASEURL . 'register/index/wrongusername');
                         }
@@ -170,7 +165,7 @@ class Register extends Controller{
                             $_SESSION['checking'] = "emailtaken";
                             return header('Location: '. BASEURL . 'register/index/emailtaken');                                                                            
                         }
-                        else if(filter_var($email, FILTER_VALIDATE_EMAIL) && filter_var($name, FILTER_SANITIZE_STRING)){
+                        else if(filter_var($email, FILTER_VALIDATE_EMAIL) && ($lowercasename)){
                             if($this->model('UsersModel')->addUser($_POST) > 0){
                                 $this->sendemail($_POST['email']);                                            
                             }
