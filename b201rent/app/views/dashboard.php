@@ -29,7 +29,7 @@
     <!-- Sidebar -->
     <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar" style="background-color: #760933;">
       
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?=BASEURL?>dashboard/showitem">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?=BASEURL?>dashboard">
         <div class="sidebar-brand-icon">
           <i class="fas fa-fw fa-tachometer-alt"></i>
         </div>
@@ -88,11 +88,12 @@
                         
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $_SESSION['user_name'] ?></span>                
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $data['user_name'] ?></span>                
               </a>                            
             </li>
             <li class="d-flex align-items-center">
-              <form id="logout-form" action="<?=BASEURL?>logout" method="POST">                         
+              <form id="logout-form" action="<?=BASEURL?>logout" method="POST">
+                <input type="hidden" name="csrf_token" value="<?=$data['csrf']?>">                         
                 <button type="submit" style="background-color: transparent; border: none;">Logout</button>
               </form>
             </li>
@@ -422,6 +423,19 @@
             </div>
           </div>
         </div>       
+      <?php
+      }
+      else if(isset($data['notification'])){      
+      ?>
+      <div class="container">
+        <div class="row mt-5">
+          <div class="col-lg-6">
+            <div class="alert alert-primary text-center">
+              <?=$data['notification']?>
+            </div>
+          </div>
+        </div> 
+      </div>
       <?php
       }
       ?>

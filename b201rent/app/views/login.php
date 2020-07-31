@@ -49,6 +49,7 @@
               </button>              
               <p>No Account Yet? <a href="<?=BASEURL?>register">Register</a></p>
               <p>Forgot Password? <a href="<?=BASEURL?>login/forgotpassword">Reset</a></p>
+              <p>Feel Bored? <a href="<?=BASEURL?>">Home</a></p>
             </form>
           </div>
         </div>

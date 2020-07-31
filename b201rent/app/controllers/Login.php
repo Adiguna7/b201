@@ -15,8 +15,8 @@ class Login extends Controller{
             session_destroy();
         }
         // if (empty($_SESSION['token'])) {
-        $_SESSION['token'] = bin2hex(random_bytes(32));
-        // }    
+        // $_SESSION['token'] = bin2hex(random_bytes(32));        
+        // }            
 
         // error controlling
         if(isset($error)){
@@ -89,9 +89,11 @@ class Login extends Controller{
         // end error controlling
 
         $data['captcha'] = Captcha::source(5, 200, 50);
-        $data['captcha_name'] = Captcha::sessionName();
-        $data['csrf'] = $_SESSION['token'];        
-        // var_dump($token);                               
+        $data['captcha_name'] = Captcha::sessionName();                   
+        // var_dump($token);
+        $_SESSION['token'] = bin2hex(random_bytes(32)); 
+        $data['csrf'] = $_SESSION['token'];
+        // var_dump(($_SESSION['token']));                                       
         $data['title'] = "Login";        
         $this->view('layouts/head', $data);       
         $this->view('login', $data);

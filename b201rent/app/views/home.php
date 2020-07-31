@@ -14,9 +14,12 @@
                 <?php
                 if(isset($data['user_name']) && $data['role'] == "user"){                                
                 ?>
-                <i class="fa fa-user"></i><span class="mx-2"><?=$data['user_name']?></span>                
-                <span><a href="<?=BASEURL?>home/history" style="display: inline;">History</a></span>
-                <span><a href="<?=BASEURL?>logout" style="display: inline;">Logout</a></span>
+                <form action="<?=BASEURL?>logout" method="post">
+                    <i class="fa fa-user"></i><span class="mx-2"><?=$data['user_name']?></span>                
+                    <span><a href="<?=BASEURL?>home/history" style="display: inline;">History</a></span>                
+                    <input type="hidden" name="csrf_token" value="<?=$data['csrf']?>" />
+                    <span><button type="submit" style="display: inline; border:none; background-color: transparent; font-size: 14px;" >Logout</button></span>
+                </form>
                 <?php
                 }
                 else{                                
@@ -56,9 +59,12 @@
                                 <?php
                                 if(isset($data['user_name']) && $data['role'] == "user"){                                
                                 ?>
-                                <i class="fa fa-user"></i><span class="mx-2"><?=$data['user_name']?></span>                                
-                                <span><a href="<?=BASEURL?>home/history" style="display: inline;">History</a></span>
-                                <span><a href="<?=BASEURL?>logout" style="display: inline;">Logout</a></span>
+                                <form action="<?=BASEURL?>logout" method="post">
+                                    <i class="fa fa-user"></i><span class="mx-2"><?=$data['user_name']?></span>                
+                                    <span><a href="<?=BASEURL?>home/history" style="display: inline;">History</a></span>                
+                                    <input type="hidden" name="csrf_token" value="<?=$data['csrf']?>" />
+                                    <span><button type="submit" style="display: inline; border:none; background-color: transparent; font-size: 14px;" >Logout</button></span>
+                                </form>
                                 <?php
                                 }
                                 else{                                

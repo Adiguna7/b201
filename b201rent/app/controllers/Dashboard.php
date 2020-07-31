@@ -14,7 +14,13 @@ class Dashboard extends Controller{
         // var_dump($_SESSION);
         // $admin['name'] = $_SESSION['user_name'];                
         if(isset($_SESSION['role']) && $_SESSION['role'] == "admin"){
-            return $this->view('dashboard', $_SESSION);            
+            // if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+            // }
+            $data['csrf'] = $_SESSION['token'];
+            $data['user_name'] = $_SESSION['user_name'];
+            $data['notification'] = "Selamat Datang di Dashboard Admin";
+            return $this->view('dashboard', $data);            
         }        
         else{
             // var_dump($admin['name']);
@@ -52,6 +58,11 @@ class Dashboard extends Controller{
             
             // var_dump($data['items_rent']);
             unset($_SESSION['checking_admin']);
+            // if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+            // }
+            $data['csrf'] = $_SESSION['token'];
+            $data['user_name'] = $_SESSION['user_name'];
             return $this->view('dashboard', $data);
         }
                             
@@ -64,6 +75,11 @@ class Dashboard extends Controller{
         }
         else{
             $data['history'] = $this->model('TransaksiModel')->getAllHistory();
+            // if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+            // }
+            $data['csrf'] = $_SESSION['token'];
+            $data['user_name'] = $_SESSION['user_name'];
             return $this->view('dashboard', $data);
         }        
     }
@@ -75,6 +91,11 @@ class Dashboard extends Controller{
         }
         else{
             $data['users'] = $this->model('UsersModel')->getAll();
+            // if (empty($_SESSION['token'])) {
+            $_SESSION['token'] = bin2hex(random_bytes(32));
+            // }
+            $data['csrf'] = $_SESSION['token'];
+            $data['user_name'] = $_SESSION['user_name'];
             return $this->view('dashboard', $data);
         }        
     }

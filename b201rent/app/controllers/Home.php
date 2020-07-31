@@ -21,14 +21,18 @@ class Home extends Controller{
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
             $data['title'] = "Welcome";
+            if (empty($_SESSION['token'])) {
+                $_SESSION['token'] = bin2hex(random_bytes(32)); 
+            }
+            $data['csrf'] = $_SESSION['token'];
             $this->view('user/homehead', $data);        
             $this->view('home', $data);
             return $this->view('user/hometail');
         }
         elseif(isset($_SESSION['role']) && $_SESSION['role'] == "admin"){            
-            header("Location: ". BASEURL . "dashboard");
+            return header("Location: ". BASEURL . "dashboard");
         }
-        else{
+        else{            
             $data['title'] = "Welcome";
             $this->view('user/homehead', $data);        
             $this->view('home', $data);
@@ -41,6 +45,10 @@ class Home extends Controller{
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
             $data['title'] = "Contact";
+            if (empty($_SESSION['token'])) {
+                $_SESSION['token'] = bin2hex(random_bytes(32)); 
+            }
+            $data['csrf'] = $_SESSION['token'];
             $this->view('user/homehead', $data);        
             $this->view('contact', $data);
             return $this->view('user/hometail');
@@ -69,6 +77,10 @@ class Home extends Controller{
         if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
             $data['role'] = $_SESSION['role'];
             $data['user_name'] = $_SESSION['user_name'];
+            if (empty($_SESSION['token'])) {
+                $_SESSION['token'] = bin2hex(random_bytes(32)); 
+            }
+            $data['csrf'] = $_SESSION['token'];
         }
         if($category != NULL){
             if($this->model('ItemsModel')->getFromCategory($category)){            
@@ -105,6 +117,10 @@ class Home extends Controller{
                 if(isset($_SESSION['role']) && $_SESSION['role'] == "user"){
                     $data['role'] = $_SESSION['role'];
                     $data['user_name'] = $_SESSION['user_name'];
+                    if (empty($_SESSION['token'])) {
+                        $_SESSION['token'] = bin2hex(random_bytes(32)); 
+                    }
+                    $data['csrf'] = $_SESSION['token'];
                 }
                 $data['title'] = "Itemdetail";            
                 $this->view('user/homehead', $data);
@@ -129,6 +145,10 @@ class Home extends Controller{
                 $data['userid'] = $data['user']['userId'];
                 $data['item'] = $this->model('ItemsModel')->getById($itemid);
                 $data['status'] = $this->model('TransaksiModel')->getStatus($data['userid']);
+                if (empty($_SESSION['token'])) {
+                    $_SESSION['token'] = bin2hex(random_bytes(32)); 
+                }
+                $data['csrf'] = $_SESSION['token'];
                 // var_dump($data['status']);
                 if(!$data['status']){
                     $_SESSION['status'] = "pass";                    
@@ -185,6 +205,12 @@ class Home extends Controller{
             $data['user'] = $this->model('UsersModel')->getByUsername($data['user_name']);
             $data['history'] = $this->model('TransaksiModel')->getByUseridHistory($data['user']['userId']);            
             $data['endcharge'] = $this->model('TransaksiModel')->getTimeEndSingle($data['user']['userId']);
+            
+            if (empty($_SESSION['token'])) {
+                $_SESSION['token'] = bin2hex(random_bytes(32)); 
+            }
+            $data['csrf'] = $_SESSION['token'];
+
             $datenow = date('Y-m-d');
             $datenowtime = strtotime($datenow);            
             $dateendtime = strtotime($data['endcharge']['transaksi_end']);        
